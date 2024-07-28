@@ -1,5 +1,7 @@
 import requests
-import ujson as json
+import logger
+
+logger = Logger()
 
 def create_user(url, apikey, username, password, permission=1):
         """
@@ -31,9 +33,9 @@ def create_user(url, apikey, username, password, permission=1):
             if response.status_code == 200:
                 return r.json()["data"]["uuid"]
             else:
-                print(f"Failed to create user. Status code: {response.status_code}")
+                logger.error(f"Failed to create user. Status code: {response.status_code}")
                 return False
         except requests.exceptions.RequestException as e:
-            print(f"Exception occurred in Mcsm Create User: {e}")
+            logger.error(f"Exception occurred in Mcsm Create User: {e}")
             return False
     
