@@ -3,6 +3,7 @@
         "min": 2,
         "max": 7
     },
+    "port": 80,
     "mcsm": {
         "apikey": "5e46173b3600401387133c3724a4bd04",
         "url": "s1.rancloud.xyz:23333/"
