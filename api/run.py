@@ -56,8 +56,8 @@ def register_user():
 
         cursor.execute(
             'INSERT INTO users (username, password) VALUES (?, ?)', (username, hashed_password))
-        mcsm.create_user(url=config['mcsm']['url'], apikey=config['mcsm']
-                         ['apikey'], username=username, password=password)
+        mcsm.create_user(url=config['mcsm']['url'], apikey=config['mcsm']['apikey'], 
+                        username=username, password=password)
         return jsonify({'message': '注册成功'}), 201
 
 
