@@ -7,7 +7,7 @@ with open(os.path.join(os.path.dirname(__file__), 'config.json'), 'r') as file:
 
 port = config['port']
 
-app = Flask(__name__, static_folder='public')
+app = Flask(__name__, static_folder='templates')
 
 @app.route('/<path:filename>')
 def serve_static(filename):
