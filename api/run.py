@@ -1,4 +1,5 @@
 import sqlite3
+import bcrypt
 from flask import Flask, request, jsonify
 from datetime import datetime
 import secrets
@@ -11,6 +12,7 @@ app = Flask(__name__)
 
 with open(os.path.join(os.path.dirname(__file__), 'config.json'), 'r') as file:
     config = json.load(file)
+
 
 class DBConnection:
     def __init__(self):
@@ -44,6 +46,7 @@ def register_user():
     data = request.json
     username = data.get('username')
     password = data.get('password')
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
     if not username or not password:
         return jsonify({'error': '缺少用户名或密码'}), 400
 
@@ -52,8 +55,9 @@ def register_user():
             return jsonify({'error': '用户名已被占用'}), 400
 
         cursor.execute(
-            'INSERT INTO users (username, password) VALUES (?, ?)', (username, password))
-        mcsm.create_user(url=config['mcsm']['url'],apikey=config['mcsm']['apikey'],username=username,password=password)
+            'INSERT INTO users (username, password) VALUES (?, ?)', (username, hashed_password))
+        mcsm.create_user(url=config['mcsm']['url'], apikey=config['mcsm']
+                         ['apikey'], username=username, password=password)
         return jsonify({'message': '注册成功'}), 201
 
 
@@ -62,12 +66,13 @@ def login_user():
     data = request.json
     username = data.get('username')
     password = data.get('password')
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
     if not username or not password:
         return jsonify({'error': '缺少用户名或密码'}), 400
 
     with DBConnection() as cursor:
         user = cursor.execute(
-            'SELECT points, token FROM users WHERE username=? AND password=?', (username, password)).fetchone()
+            'SELECT points, token FROM users WHERE username=? AND password=?', (username, hashed_password)).fetchone()
         if user:
             token = secrets.token_hex(16)
             cursor.execute(
