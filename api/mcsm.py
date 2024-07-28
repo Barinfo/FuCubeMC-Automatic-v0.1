@@ -27,9 +27,9 @@ def create_user(url, apikey, username, password, permission=1):
         }
     
         try:
-            r = requests.post(api_url, json=data, headers=headers)
+            response = requests.post(api_url, json=data, headers=headers)
             if response.status_code == 200:
-                return json.loads(r)["data"]["uuid"]
+                return r.json()["data"]["uuid"]
             else:
                 print(f"Failed to create user. Status code: {response.status_code}")
                 return False
