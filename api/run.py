@@ -72,7 +72,7 @@ def login_user():
 
     with DBConnection() as cursor:
         user = cursor.execute(
-            'SELECT points, token FROM users WHERE username=? AND password=?', (username, hashed_password)).fetchone()
+            'SELECT points FROM users WHERE username=? AND password=?', (username, hashed_password)).fetchone()
         if user:
             token = secrets.token_hex(16)
             cursor.execute(
