@@ -1,3 +1,4 @@
 flask
 ujson
 bcrypt
+requests

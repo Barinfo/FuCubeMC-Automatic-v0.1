@@ -31,6 +31,7 @@ with DBConnection() as cursor:
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            uuid TEXT NOT NULL,
             username TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL,
             ban TEXT DEFAULT 'false',
@@ -53,12 +54,13 @@ def register_user():
     with DBConnection() as cursor:
         if cursor.execute('SELECT username FROM users WHERE username=?', (username,)).fetchone():
             return jsonify({'error': '用户名已被占用'}), 400
-
-        cursor.execute(
-            'INSERT INTO users (username, password) VALUES (?, ?)', (username, hashed_password))
-        mcsm.create_user(url=config['mcsm']['url'], apikey=config['mcsm']['apikey'], 
-                        username=username, password=password)
-        return jsonify({'message': '注册成功'}), 201
+        uuid = mcsm.create_user(config['mcsm']['url'], config['mcsm']['apikey'], username, password)
+        if uuid:
+          cursor.execute(
+            'INSERT INTO users (username, password, uuid) VALUES (?, ?)', (username, hashed_password, uuid))
+          return jsonify({'message': '注册成功'}), 201
+        else:
+          return jsonify({'error': uuid}), 500
 
 
 @app.route('/login', methods=['POST'])
