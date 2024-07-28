@@ -1,4 +1,4 @@
-from request_sender import sendRequest
+import requests
 
 def create_user(url, apikey, username, password, permission=1):
     # 创建用户
@@ -18,6 +18,6 @@ def create_user(url, apikey, username, password, permission=1):
         'permission': permission, 
     }
 
-    response = sendRequest(api_url, apikey, method="post", body=_body)
+    res=requests.post(data=_body)
 
     return True
