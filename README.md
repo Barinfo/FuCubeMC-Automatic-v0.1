@@ -5,6 +5,7 @@
 An automatic controller for MCSManager
 
 ## 没想好写什么介绍 后续补充
+本项目制作中，使用后果自负
 
 ### 感谢这几个老βyd开发者
 
