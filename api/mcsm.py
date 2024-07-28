@@ -1,3 +1,5 @@
+from request_sender import sendRequest
+
 def create_user(url, apikey, username, password, permission=1):
     # 创建用户
     # 返回类型：bool
