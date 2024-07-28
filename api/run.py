@@ -89,7 +89,7 @@ def check_in():
                     return jsonify({'error': '身份验证失败'}), 401
 
                 if ban == 'true':
-                    return jsonify({'error': '爪巴，不许签到！'}), 403
+                    return jsonify({'error': '你已被封禁'}), 403
 
                 today = datetime.now().date()
                 if user[0] and datetime.strptime(user[0], '%Y-%m-%d %H:%M:%S').date() == today:
