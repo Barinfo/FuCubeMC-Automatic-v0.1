@@ -2,3 +2,4 @@ flask
 ujson
 bcrypt
 requests
+sqlitepool

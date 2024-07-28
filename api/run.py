@@ -6,6 +6,7 @@ import secrets
 import random
 import ujson as json
 import os
+import sqlitepool
 import mcsm
 
 app = Flask(__name__)
@@ -13,18 +14,18 @@ app = Flask(__name__)
 with open(os.path.join(os.path.dirname(__file__), 'config.json'), 'r') as file:
     config = json.load(file)
 
-
 class DBConnection:
     def __init__(self):
-        self.conn = sqlite3.connect('users.db', check_same_thread=False)
-        self.cursor = self.conn.cursor()
+        self.pool = sqlitepool.ConnectionPool('sqlite:///users.db', maxconnections=5)
 
     def __enter__(self):
+        self.conn = self.pool.getconn()
+        self.cursor = self.conn.cursor()
         return self.cursor
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.conn.commit()
-        self.conn.close()
+        self.pool.putconn(self.conn)
 
 
 with DBConnection() as cursor:
@@ -119,4 +120,4 @@ def check_in():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=config["port"])
+    app.run(host='0.0.0.0', port=config["port"], threaded=True)
