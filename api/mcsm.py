@@ -10,7 +10,7 @@ def create_user(url, apikey, username, password, permission=1):
     # password: 密码
     # permission: -1（封禁）；1（普通权限）；10（最高权限）
 
-    api_url = url + "/api/overview/setting"
+    api_url = url + "/api/create _user?apikey="+apikey
 
     _body = {
         'username': username, 
@@ -18,6 +18,6 @@ def create_user(url, apikey, username, password, permission=1):
         'permission': permission, 
     }
 
-    res=requests.post(data=_body)
+    res=requests.post(api_url, data=_body)
 
     return True
