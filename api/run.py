@@ -4,10 +4,11 @@ from datetime import datetime
 import secrets
 import random
 import ujson as json
+import os
 
 app = Flask(__name__)
 
-with open('config.json', 'r') as file:
+with open(os.path.join(os.path.dirname(__file__), 'config.json'), 'r') as file:
     config = json.load(file)
 
 class DBConnection:
