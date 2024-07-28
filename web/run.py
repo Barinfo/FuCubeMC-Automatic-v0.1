@@ -5,8 +5,6 @@ import ujson as json
 with open(os.path.join(os.path.dirname(__file__), 'config.json'), 'r') as file:
     config = json.load(file)
 
-port = config['port']
-
 app = Flask(__name__, static_folder='templates')
 
 
@@ -21,4 +19,4 @@ def home():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=config['port'])
