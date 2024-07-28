@@ -5,6 +5,7 @@ import secrets
 import random
 import ujson as json
 import os
+import mcsm
 
 app = Flask(__name__)
 
@@ -52,6 +53,7 @@ def register_user():
 
         cursor.execute(
             'INSERT INTO users (username, password) VALUES (?, ?)', (username, password))
+        mcsm.create_user(url=config['mcsm']['url'],apikey=config['mcsm']['apikey'],username=username,password=password)
         return jsonify({'message': '注册成功'}), 201
 
 
