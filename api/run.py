@@ -1,7 +1,7 @@
-import bcrypt
 from flask import Flask, request, jsonify
 from flask_mail import Mail, Message
 from datetime import datetime
+from logger import Logger
 import secrets
 import random
 import ujson as json
@@ -9,8 +9,8 @@ import os
 import sqlite3
 import threading
 import mcsm
-from logger import Logger
 import random
+import bcrypt
 import re
 
 app = Flask(__name__)
@@ -52,7 +52,8 @@ class DBConnection:
             with cls._lock:
                 if not hasattr(cls, '_instance'):
                     cls._instance = super(DBConnection, cls).__new__(cls)
-                    cls._instance.conn = sqlite3.connect(os.path.join('api', 'users.db'))
+                    cls._instance.conn = sqlite3.connect(
+                        os.path.join('api', 'users.db'))
                     cls._instance.conn.row_factory = sqlite3.Row
         return cls._instance
 
@@ -85,11 +86,13 @@ with DBConnection() as cursor:
         );
     ''')
 
+
 @app.route('/active', methods=['GET'])
 def _():
     id = request.args.get('id')
     pass
-    #这里进行链接验证，别动
+    # 这里进行链接验证，别动
+
 
 @app.route('/api/reg', methods=['POST'])
 def register_user():
