@@ -40,6 +40,8 @@ python server.py
 
 [JMcGee3697](https://github.com/barinfo)
 
-依然云[@JMcGee3697](https://github.com/barinfo)~~这不要脸的~~提供服务器资源支持
+[夜影星辰](https://github.com/yeying-xingchen)
+
+and 依然云[@JMcGee3697](https://github.com/barinfo)~~这不要脸的~~提供服务器资源支持
 
 *FuCubeMC 芙方云 2024 All Rights Reserved*
