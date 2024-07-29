@@ -6,15 +6,14 @@ import secrets
 import random
 import ujson as json
 import os
-import random
 import bcrypt
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='templates')
 
 app.config['MAIL_SERVER'] = 'smtp.yeah.net'
 app.config['MAIL_PORT'] = 25
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_email'] = 'barinfo@yeah.net'
+app.config['MAIL_USERNAME'] = 'barinfo@yeah.net'
 app.config['MAIL_PASSWORD'] = 'TQCSAJGFEWKOPJGM'
 app.config['SECRET_KEY'] = '?'
 
@@ -51,8 +50,6 @@ with DBConnection() as cursor:
             token TEXT
         );
     ''')
-
-app = Flask(__name__, static_folder='templates')
 
 
 @app.route('/active', methods=['GET'])
@@ -138,8 +135,8 @@ def register_user():
 <table class="main" width="100%" cellpadding="0" cellspacing="0" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; border-radius: 3px; background-color: #fff; margin: 0; border: 1px 
 solid #e9e9e9;
 " bgcolor=" #fff">
-<tbody>
-    <tr style=" font-family: 'Helvetica Neue',
+    <tbody>
+        <tr style=" font-family: 'Helvetica Neue',
 Helvetica,
 Arial,
 sans-serif;
@@ -147,7 +144,7 @@ box-sizing: border-box;
 font-size: 14px;
 margin: 0;
 ">
-        <td class=" alert alert-warning" style=" font-family: 'Helvetica Neue',
+            <td class=" alert alert-warning" style=" font-family: 'Helvetica Neue',
 Helvetica,
 Arial,
 sans-serif;
@@ -162,8 +159,8 @@ background-color: #009688;
 margin: 0;
 padding: 20px;
 " align=" center" bgcolor=" #FF9F00" valign=" top">激活FuCube账户</td>
-    </tr>
-    <tr style=" font-family: 'Helvetica Neue',
+        </tr>
+        <tr style=" font-family: 'Helvetica Neue',
 Helvetica,
 Arial,
 sans-serif;
@@ -171,7 +168,7 @@ box-sizing: border-box;
 font-size: 14px;
 margin: 0;
 ">
-        <td class=" content-wrap" style=" font-family: 'Helvetica Neue',
+            <td class=" content-wrap" style=" font-family: 'Helvetica Neue',
 Helvetica,
 Arial,
 sans-serif;
@@ -181,7 +178,7 @@ vertical-align: top;
 margin: 0;
 padding: 20px;
 " valign=" top">
-            <table width=" 100%" cellpadding=" 0" cellspacing=" 0" style=" font-family: 'Helvetica Neue',
+                <table width=" 100%" cellpadding=" 0" cellspacing=" 0" style=" font-family: 'Helvetica Neue',
 Helvetica,
 Arial,
 sans-serif;
@@ -189,8 +186,8 @@ box-sizing: border-box;
 font-size: 14px;
 margin: 0;
 ">
-                <tbody>
-                    <tr style=" font-family: 'Helvetica Neue',
+                    <tbody>
+                        <tr style=" font-family: 'Helvetica Neue',
 Helvetica,
 Arial,
 sans-serif;
@@ -198,23 +195,23 @@ box-sizing: border-box;
 font-size: 14px;
 margin: 0;
 ">
-                        <td class=" content-block" style=" font-family: 'Helvetica 
+                            <td class=" content-block" style=" font-family: 'Helvetica 
 Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">亲爱的<strong style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;"><a href="mailto:{email}" rel="noopener" target="_blank">{email}</a></strong>：</td>
-                    </tr>
-                    <tr style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
-                        <td class="content-block" style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">感谢您注册FuCube,请点击下方按钮完成账户激活。</td>
-                    </tr>
-                    <tr style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
-                        <td class="content-block" style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top"><a href="https://{config["hostname"]}/active?id={vid}" class="btn-primary" style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; color: #FFF; text-decoration: none; line-height: 2em; font-weight: bold; text-align: center; cursor: pointer; display: inline-block; border-radius: 5px; text-transform: capitalize; background-color: #009688; margin: 0; border-color: #009688; border-style: solid; border-width: 10px 20px;" rel="noopener" target="_blank">激活账户</a></td>
-                    </tr>
-                    <tr style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
-                        <td class="content-block" style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">感谢您选择FuCube。</td>
-                    </tr>
-                </tbody>
-            </table>
-        </td>
-    </tr>
-</tbody>
+                        </tr>
+                        <tr style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                            <td class="content-block" style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">感谢您注册FuCube,请点击下方按钮完成账户激活。</td>
+                        </tr>
+                        <tr style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                            <td class="content-block" style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top"><a href="https://{config[" hostname"]}/active?id={vid}" class="btn-primary" style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; color: #FFF; text-decoration: none; line-height: 2em; font-weight: bold; text-align: center; cursor: pointer; display: inline-block; border-radius: 5px; text-transform: capitalize; background-color: #009688; margin: 0; border-color: #009688; border-style: solid; border-width: 10px 20px;" rel="noopener" target="_blank">激活账户</a></td>
+                        </tr>
+                        <tr style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                            <td class="content-block" style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">感谢您选择FuCube。</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </tbody>
 </table>
         '''
         mail.send(msg)
