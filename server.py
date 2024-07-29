@@ -66,7 +66,8 @@ def active_account():
     <title>验证结果</title>
 </head>
 <body>
-    <h1>验证成功</h1>
+    <h1 style="color:#66ccff;">验证成功，3秒后跳转到登录页面。</h1>
+    <script>window.onload(function(){setInterval(function(){window.location.href="https://yun.wh1t3zz.top/login";},3000);});</script>
 </body>
 </html>'''
     else:
