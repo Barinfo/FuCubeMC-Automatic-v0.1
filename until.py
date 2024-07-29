@@ -25,34 +25,20 @@ def is_email(email: str) -> bool:
 
 
 class DBConnection:
-    _lock = threading.Lock()
-    _connection = None
-
-    def __new__(cls):
-        if not hasattr(cls, '_instance'):
-            with cls._lock:
-                if not hasattr(cls, '_instance'):
-                    cls._instance = super(DBConnection, cls).__new__(cls)
-                    cls._instance.conn = sqlite3.connect(
-                        os.path.join(os.path.dirname(__file__), 'users.db'))
-                    cls._instance.conn.row_factory = sqlite3.Row
-        return cls._instance
-
-    def get_cursor(self):
-        return self.conn.cursor()
-
-    def close(self):
-        if self.conn:
-            self.conn.close()
+    def __init__(self):
+        self.conn = sqlite3.connect(os.path.join(
+            os.path.dirname(__file__), 'users.db'))
+        self.conn.row_factory = sqlite3.Row
 
     def __enter__(self):
-        return self.get_cursor()
+        return self.conn.cursor()
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_value, traceback):
         if exc_type is None:
             self.conn.commit()
         else:
             self.conn.rollback()
+        self.conn.close()
 
 
 class Logger:
@@ -122,8 +108,7 @@ class Logger:
 class AccountVerification:
     def __init__(self) -> None:
         """初始化AccountVerification类，建立数据库连接。"""
-        self.db = DBConnection()
-        with self.db as cursor:
+        with DBConnection() as cursor:
             cursor.execute(
                 """
                 CREATE TABLE IF NOT EXISTS account_verifications (
@@ -147,7 +132,7 @@ class AccountVerification:
             str: 生成的验证ID。
         """
         verification_id = str(uuid.uuid4())
-        with self.db as cursor:
+        with DBConnection() as cursor:
             cursor.execute(
                 "INSERT INTO account_verifications (email, verification_id) VALUES (?, ?, ?)",
                 (email, verification_id)
@@ -164,7 +149,7 @@ class AccountVerification:
         返回:
             bool: 如果更新成功则返回True，否则False。
         """
-        with self.db as cursor:
+        with DBConnection() as cursor:
             cursor.execute(
                 "UPDATE account_verifications SET verified = 1 WHERE verification_id = ?",
                 (verification_id,)
@@ -181,7 +166,7 @@ class AccountVerification:
         返回:
             bool: 如果已验证则返回True，否则False。
         """
-        with self.db as cursor:
+        with DBConnection() as cursor:
             cursor.execute(
                 "SELECT verified FROM account_verifications WHERE email = ?",
                 (identifier,)
@@ -199,7 +184,7 @@ class AccountVerification:
         返回:
             str: 邮箱
         """
-        with self.db as cursor:
+        with DBConnection() as cursor:
             cursor.execute(
                 "SELECT email FROM account_verifications WHERE verification_id = ?",
                 (vid,)

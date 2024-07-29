@@ -1,5 +1,5 @@
-from flask import Flask, send_from_directory, abort, request, jsonify
-from flask_mail import Mail, Message
+from flask import request, jsonify, Blueprint
+from flask_mail import Message, Mail
 from datetime import datetime
 from until import Logger, AccountVerification, DBConnection, is_email, Mcsm
 import secrets
@@ -8,24 +8,6 @@ import ujson as json
 import os
 import random
 import bcrypt
-
-app = Flask(__name__)
-
-app.config['MAIL_SERVER'] = 'smtp.yeah.net'
-app.config['MAIL_PORT'] = 25
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_email'] = 'barinfo@yeah.net'
-app.config['MAIL_PASSWORD'] = 'TQCSAJGFEWKOPJGM'
-app.config['SECRET_KEY'] = '?'
-
-mail = Mail(app)
-
-with open(os.path.join(os.path.dirname(__file__), 'config.json'), 'r') as file:
-    config = json.load(file)
-
-logger = Logger()
-Ver = AccountVerification()
-mcsm = Mcsm(config["mcsm"]["url"], config["mcsm"]["apikey"], logger)
 
 
 def load_salt():
@@ -38,55 +20,19 @@ def load_salt():
     return config['salt'].encode('utf-8')
 
 
-with DBConnection() as cursor:
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            uuid TEXT NOT NULL,
-            eamil TEXT NOT NULL UNIQUE,
-            password TEXT NOT NULL,
-            ban TEXT DEFAULT 'false',
-            points INTEGER DEFAULT 0,
-            last_sign TIMESTAMP,
-            token TEXT
-        );
-    ''')
 
-app = Flask(__name__, static_folder='templates')
+with open(os.path.join(os.path.dirname(__file__), 'config.json'), 'r') as file:
+    config = json.load(file)
+
+logger = Logger()
+Ver = AccountVerification()
+mcsm = Mcsm(config["mcsm"]["url"], config["mcsm"]["apikey"], logger)
+mail = Mail()
+
+api_bp = Blueprint('api', __name__, url_prefix='/api')
 
 
-@app.route('/active', methods=['GET'])
-def active_account():
-    vid = request.args.to_dict().get('id')
-    if Ver.verify_id(vid):
-        mcsm.update_permission(cursor.execute(
-            'SELECT uuid FROM users WHERE email=?', (Ver.get_email(vid),)).fetchone()[0], 1)
-        return '''
-    <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>验证结果</title>
-</head>
-<body>
-    <h1>验证成功</h1>
-</body>
-</html>'''
-    else:
-        return '''
-    <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>验证结果</title>
-</head>
-<body>
-    <h1>验证失败</h1>
-</body>
-</html>'''
-
-
-@app.route('/api/reg', methods=['POST'])
+@api_bp.route('/reg', methods=['POST'])
 def register_user():
     data = request.args.to_dict()
     password = data.get('password')
@@ -203,7 +149,7 @@ margin: 0;
             return jsonify({'error': uuid}), 500
 
 
-@app.route('/api/login', methods=['POST'])
+@api_bp.route('/login', methods=['POST'])
 def login_user():
     data = request.args.to_dict()
     email = data.get('email')
@@ -227,7 +173,7 @@ def login_user():
             return jsonify({'error': '账号或密码错误'}), 401
 
 
-@app.route('/api/sign', methods=['POST'])
+@api_bp.route('/sign', methods=['POST'])
 def check_in():
     data = request.args.to_dict()
     email = data.get('email')
@@ -262,40 +208,3 @@ def check_in():
                 return jsonify({'error': '用户不存在'}), 404
     else:
         return jsonify({'error': '缺少传参'}), 400
-
-
-@app.route('/')
-def home():
-    return send_from_directory(app.static_folder, 'index.html')
-
-@app.route('/reg')
-def reg():
-    return send_from_directory(app.static_folder, 'reg.html')
-
-@app.route('/login')
-def login():
-    return send_from_directory(app.static_folder, 'login.html')
-
-@app.route('/panel')
-def panel():
-    return send_from_directory(app.static_folder, 'panel.html')
-
-
-
-@app.route('/css/<path:filename>')
-def css(filename):
-    try:
-        return send_from_directory(os.path.join(app.static_folder, "css"), filename)
-    except FileNotFoundError:
-        abort(404)
-        
-@app.route('/js/<path:filename>')
-def js(filename):
-    try:
-        return send_from_directory(os.path.join(app.static_folder, "js"), filename)
-    except FileNotFoundError:
-        abort(404)
-
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=config["port"], threaded=True)
