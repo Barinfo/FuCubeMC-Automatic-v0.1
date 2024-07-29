@@ -271,7 +271,6 @@ class Mcsm:
             }
         }
         response = requests.put(api_url, data=data, headers={
-            'Content-Type': 'application/json; charset=utf-8',
             'X-Requested-With': 'XMLHttpRequest'
         })
         redata = json.loads(response.text)
