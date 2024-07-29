@@ -226,14 +226,14 @@ class Mcsm:
         try:
             response = requests.post(api_url, data=data, headers=headers)
             if response.status_code == 200:
-                return response.json()["data"]["uuid"]
+                return [True, response.json()["data"]["uuid"]]
             else:
                 self.logger.error(
                     f"Failed to create user. Status code: {response.status_code}")
-                return False
+                return [False, response.json()["data"]]
         except requests.exceptions.RequestException as e:
             self.logger.error(f"Exception occurred in Mcsm Create User: {e}")
-            return False
+            return [False, e]
 
     def update_permission(self, uuid: str, permission=int):
         """

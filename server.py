@@ -107,7 +107,7 @@ def register_user():
         if cursor.execute('SELECT email FROM users WHERE email=?', (email,)).fetchone():
             return jsonify({'error': '邮箱已被注册'}), 400
         uuid = mcsm.create_user(email, password, 1)
-        if uuid:
+        if uuid[0] == True:
             cursor.execute(
                 'INSERT INTO users (email, password, uuid) VALUES (?, ?)', (email, hashed_password, uuid))
             logger.info(f"用户 {email} 执行注册成功")
@@ -200,7 +200,7 @@ margin: 0;
             mail.send(msg)
             return jsonify({'message': '注册成功，请前往邮箱验证'}), 200
         else:
-            return jsonify({'error': uuid}), 500
+            return jsonify({'error': uuid[1]}), 500
 
 
 @app.route('/api/login', methods=['POST'])
