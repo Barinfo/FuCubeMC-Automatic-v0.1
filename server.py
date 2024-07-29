@@ -56,8 +56,7 @@ with DBConnection() as cursor:
 def active_account():
     vid = request.args.to_dict().get('id')
     if Ver.verify_id(vid):
-        #mcsm.update_permission(cursor.execute(
-        #    'SELECT uuid FROM users WHERE email=?', (Ver.get_email(vid),)).fetchone()[0], 1)
+        logger.info(f"用户 {Ver.get_email(vid)} 执行激活成功")
         return '''
     <!DOCTYPE html>
 <html lang="en">
@@ -70,6 +69,7 @@ def active_account():
 </body>
 </html>'''
     else:
+        logger.info(f"用户 {Ver.get_email(vid)} 执行激活失败")
         return '''
     <!DOCTYPE html>
 <html lang="en">

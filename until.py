@@ -151,7 +151,7 @@ class AccountVerification:
         """
         with DBConnection() as cursor:
             cursor.execute(
-                "UPDATE account_verifications SET verified = 1 WHERE verification_id = ?",
+                "UPDATE account_verifications SET verified = 1 WHERE verification_id = ? AND verified = 0",
                 (verification_id,)
             )
         return cursor.rowcount > 0
