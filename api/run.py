@@ -6,47 +6,65 @@ import secrets
 import random
 import ujson as json
 import os
-from DBUtils.PooledDB import PooledDB
 import sqlite3
 import threading
 import mcsm
-from logger import Logger
-
-
-
-logger = Logger()
+from logger_ import Logger_
+import random
+import re
 
 app = Flask(__name__)
 
+logger_ = Logger_()
+
+app.config['MAIL_SERVER'] = 'smtp.yeah.net'
+app.config['MAIL_PORT'] = 25
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'barinfo@yeah.net'
+app.config['MAIL_PASSWORD'] = 'TQCSAJGFEWKOPJGM'
+app.config['SECRET_KEY'] = '?'
+
+mail = Mail(app)
 
 with open(os.path.join(os.path.dirname(__file__), 'config.json'), 'r') as file:
     config = json.load(file)
 
+
+def is_email(email):
+    e = r'^[\w.-]+@(' \
+        r'qq\.com|' \
+        r'126\.com|' \
+        r'163\.com|' \
+        r'yeah\.net|' \
+        r'outlook\.com|' \
+        r'139\.com|' \
+        r'189\.com' \
+        r')$'
+    return bool(re.match(e, email))
+
+
 class DBConnection:
     _lock = threading.Lock()
-    _pool = None
+    _connection = None
 
-    def __init__(self):
-        if DBConnection._pool is None:
-            with DBConnection._lock:
-                if DBConnection._pool is None:
-                    DBConnection._pool = PooledDB(
-                        creator=sqlite3,
-                        maxusage=None,
-                        maxconnections=5,
-                        blocking=True,
-                        setsession=[],
-                        ping=0,
-                        closeable=False,
-                        threadlocal=None,
-                        database='users.db',
-                        check_same_thread=False
-                    )
-        self.conn = DBConnection._pool.connection()
-        self.cursor = self.conn.cursor()
+    def __new__(cls):
+        if not hasattr(cls, '_instance'):
+            with cls._lock:
+                if not hasattr(cls, '_instance'):
+                    cls._instance = super(DBConnection, cls).__new__(cls)
+                    cls._instance.conn = sqlite3.connect(os.path.join('api', 'users.db'))
+                    cls._instance.conn.row_factory = sqlite3.Row
+        return cls._instance
+
+    def get_cursor(self):
+        return self.conn.cursor()
+
+    def close(self):
+        if self.conn:
+            self.conn.close()
 
     def __enter__(self):
-        return self.cursor
+        return self.get_cursor()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.conn.commit()
@@ -58,7 +76,7 @@ with DBConnection() as cursor:
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             uuid TEXT NOT NULL,
-            username TEXT NOT NULL UNIQUE,
+            eamil TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL,
             ban TEXT DEFAULT 'false',
             points INTEGER DEFAULT 0,
@@ -68,30 +86,43 @@ with DBConnection() as cursor:
     ''')
 
 
-@app.route('/reg', methods=['POST'])
+@app.route('/api/reg', methods=['POST'])
 def register_user():
-    data = request.json
-    username = data.get('username')
+    data = request.form
     password = data.get('password')
+    email = data.get('email')
+
+    if not is_email(email):
+        return jsonify({'error': '邮箱格式错误'}), 400
+
+    confirm_password = data.get('confirmPassword')
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-    if not username or not password:
-        return jsonify({'error': '缺少用户名或密码'}), 400
+    if not all([email, password, confirm_password]):
+        return jsonify({'error': '缺少传参'}), 400
+
+    if password != confirm_password:
+        return jsonify({'error': '两次输入的密码不一样'}), 400
 
     with DBConnection() as cursor:
-        if cursor.execute('SELECT username FROM users WHERE username=?', (username,)).fetchone():
-            return jsonify({'error': '用户名已被占用'}), 400
-        uuid = mcsm.create_user(config['mcsm']['url'], config['mcsm']['apikey'], username, password)
+        if cursor.execute('SELECT email FROM users WHERE username=?', (email,)).fetchone():
+            return jsonify({'error': '邮箱已被注册'}), 400
+        uuid = mcsm.create_user(
+            config['mcsm']['url'], config['mcsm']['apikey'], email, password)
         if uuid:
-          cursor.execute(
-            'INSERT INTO users (username, password, uuid) VALUES (?, ?)', (username, hashed_password, uuid))
-          logger.info(f"用户 {username} 执行注册成功")
-          mcsm.create_user(url=config['mcsm']['url'],apikey=config['mcsm']['apikey'],username=username,password=password)
-          return jsonify({'message': '注册成功'}), 201
+            cursor.execute(
+                'INSERT INTO users (username, password, uuid) VALUES (?, ?)', (email, hashed_password, uuid))
+            logger_.info(f"用户 {email} 执行注册成功")
+            msg = Message('【ShitCloud】注册激活',
+                          sender='ShitCloud@com.cn', recipients=[email])
+            mail.html = "<h1>Hello</h1><p>This is an HTML email.</p>"# 这里别动，我还在写
+            mail.body = "This is an HTML email. Please view it in a client that supports HTML."
+            mail.send(msg)
+            return jsonify({'message': '注册成功，请前往邮箱验证'}), 201
         else:
-          return jsonify({'error': uuid}), 500
+            return jsonify({'error': uuid}), 500
 
 
-@app.route('/login', methods=['POST'])
+@app.route('/api/login', methods=['POST'])
 def login_user():
     data = request.json
     username = data.get('username')
@@ -107,13 +138,13 @@ def login_user():
             token = secrets.token_hex(16)
             cursor.execute(
                 'UPDATE users SET token=? WHERE username=?', (token, username))
-            logger.info(f"用户 {username} 执行登录成功")
+            logger_.info(f"用户 {username} 执行登录成功")
             return jsonify({'message': '登录成功', 'points': user[0], 'token': token}), 200
         else:
             return jsonify({'error': '账号或密码错误'}), 401
 
 
-@app.route('/sign', methods=['POST'])
+@app.route('/api/sign', methods=['POST'])
 def check_in():
     data = request.json
     username = data.get('username')
@@ -140,7 +171,7 @@ def check_in():
 
                 cursor.execute('UPDATE users SET last_sign=?, points=? WHERE username=?',
                                (datetime.now(), points + pp, username))
-                logger.info(f"用户 {username} 执行签到操作，获取积分 {pp}")
+                logger_.info(f"用户 {username} 执行签到操作，获取积分 {pp}")
                 return jsonify({'message': '签到成功', 'points': points + pp}), 200
             else:
                 return jsonify({'error': '用户不存在'}), 404

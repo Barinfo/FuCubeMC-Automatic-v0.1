@@ -2,5 +2,5 @@ flask
 ujson
 bcrypt
 requests
-DBUtils
+DBUtils==1.3
 flask_mail
