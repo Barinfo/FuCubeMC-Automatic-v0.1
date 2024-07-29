@@ -240,17 +240,12 @@ class Mcsm:
         """
         根据username获取uuid
         """
-        api_url = f"{self.url}/api/auth/search?apikey={self.apikey}"
-        data = {
-            'userName': username,
-            'page': 1,
-            'page_size': 1
-            }
+        api_url = f"{self.url}/api/auth/search?apikey={self.apikey}&userName={username}&page=1&page_size=1&role="
         headers = {
             'x-requested-with': 'xmlhttprequest'
         }
         try:
-            response = requests.get(api_url, data=data, headers=headers)
+            response = requests.get(api_url, headers=headers)
             if response.status_code == 200:
                 self.logger.debug(f"User found uuid successfully. Response: {response.json()}")
                 return response.json()["data"][0]["uuid"]
