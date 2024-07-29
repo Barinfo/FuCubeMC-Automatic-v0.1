@@ -1,4 +1,5 @@
 import requests
+import json
 from until import Logger
 
 logger = Logger()
@@ -43,7 +44,7 @@ def create_user(url, apikey, username, password, permission=1):
         return False
 
 
-def update_permission(url, apikey, uuid, permission):
+def update_permission(url, apikey, uuid:str, permission=int):
     """
     更新用户的权限并返回是否成功的布尔值。
 
@@ -58,24 +59,14 @@ def update_permission(url, apikey, uuid, permission):
     """
     api_url = url + "/api/auth?apikey=" + apikey
     data = {
-        'username': uuid,
-        'password': password,
-        'permission': permission,
-        'apikey': apikey
+        'uuid': str(uuid),
+        'config': {
+            'permission': permission
+        }
     }
-    headers = {
-        'x-requested-with': 'xmlhttprequest'
-    }
-
-    try:
-        response = requests.post(api_url, data=data, headers=headers)
-        logger.debug(response.text)
-        if response.status_code == 200:
-            return response.json()["data"]["uuid"]
-        else:
-            logger.error(
-                f"Failed to create user. Status code: {response.status_code}")
-            return False
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Exception occurred in Mcsm Create User: {e}")
-        return False
+    response = requests.put(api_url, data=data, headers={
+        'Content-Type': 'application/json; charset=utf-8',
+        'X-Requested-With': 'XMLHttpRequest'
+    })
+    redata = json.loads(response.text)
+    return redata["data"]
