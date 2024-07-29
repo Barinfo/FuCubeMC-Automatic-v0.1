@@ -1,21 +1,81 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta lang="zh-cn">
-        <title>FuCube公益面板 - 开服之路的好搭档</title>
-    </head>
-    <body>
-        <div class="nav-main">
-            <!-- 导航栏 -->
-        </div>
-        <div class="content-main">
-            <!-- 中间应该放的内容 -->
-             <a href="/reg">注册</a>
-             <a href="/login">登录</a>
-             <a href="/panel">面板</a>
-        </div>
-    </body>
+<head>
+    <meta charset="utf-8">
+    <meta lang="zh-cn">
+    <title>FuCube公益面板 - 开服之路的好搭档</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #333;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .nav-main {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+        .nav-main a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        .nav-main a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .content-main {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .bottom-main {
+            background-color: #333;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+        .bottom-link {
+            margin-bottom: 10px;
+        }
+        .bottom-link-span {
+            font-weight: bold;
+        }
+        .bottom-copyrighticp {
+            font-size: 0.9em;
+        }
+        .bottom-copyrighticp-span {
+            display: block;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 600px) {
+            .nav-main a {
+                display: block;
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="nav-main">
+        <!-- 导航栏 -->
+        <a href="/reg">注册</a>
+        <a href="/login">登录</a>
+        <a href="/panel">面板</a>
+    </div>
+    <div class="content-main">
+        开发中...
+    </div>
     <footer>
         <!-- 底部的一堆乱七八糟歪比巴卜 -->
         <div class="bottom-main">
@@ -29,4 +89,5 @@
             </div>
         </div>
     </footer>
+</body>
 </html>
