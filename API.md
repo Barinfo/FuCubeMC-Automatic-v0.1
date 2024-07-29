@@ -17,7 +17,8 @@ POST /api/reg
 
 ```js
 {
-    password: string
+    password: string,
+    confirmPassword: string, //确认密码
     email: string
 }
 ```
@@ -52,7 +53,7 @@ POST /api/login
 
 ```js
 {
-    password: string
+    password: string,
     email: string
 }
 ```
@@ -89,7 +90,7 @@ POST /api/login
 
 ```js
 {
-    token: string
+    token: string,
     email: string
 }
 ```
