@@ -1,7 +1,7 @@
 import requests
 import logger
 
-logger = Logger()
+logger = logger.Logger()
 
 def create_user(url, apikey, username, password, permission=1):
         """
