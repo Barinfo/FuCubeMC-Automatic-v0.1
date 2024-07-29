@@ -1,7 +1,5 @@
 import requests
-import logger
 
-logger = logger.Logger()
 
 def create_user(url, apikey, username, password, permission=1):
         """
@@ -17,25 +15,25 @@ def create_user(url, apikey, username, password, permission=1):
         返回:
         bool: 用户是否成功创建（True表示成功，False表示失败）
         """
-        api_url = url + "/api/auth"
-        headers = {
-            "Content-Type": "application/json;charset=utf-8",
-            "X-Requested-With": "XMLHttpRequest",
-        }
+        api_url = url + "/api/auth?apikey=" + apikey
         data = {
             'username': username,
             'password': password,
             'permission': permission,
         }
+        headers={
+            'x-requested-with': 'xmlhttprequest'
+        }
     
         try:
-            response = requests.post(api_url, json=data, headers=headers)
+            response = requests.post(api_url, data=data, headers=headers)
+            print(response.text)
             if response.status_code == 200:
-                return r.json()["data"]["uuid"]
+                return response.json["data"]["uuid"]
             else:
-                logger.error(f"Failed to create user. Status code: {response.status_code}")
+                #logger.error(f"Failed to create user. Status code: {response.status_code}")
                 return False
         except requests.exceptions.RequestException as e:
-            logger.error(f"Exception occurred in Mcsm Create User: {e}")
+            #logger.error(f"Exception occurred in Mcsm Create User: {e}")
             return False
     
