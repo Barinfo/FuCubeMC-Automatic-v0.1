@@ -34,12 +34,3 @@ if __name__ == '__main__':
     with open(os.path.join(os.path.dirname(__file__), 'config.json'), 'r') as file:
         config = json.load(file)
     app.run(host='0.0.0.0', port=config['port'], threaded=True)
-
-
-@app.route('/')
-def home():
-    return send_from_directory(app.static_folder, 'index.html')
-
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=config['port'], threaded=True)
