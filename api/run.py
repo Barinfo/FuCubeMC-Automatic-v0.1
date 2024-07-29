@@ -9,13 +9,13 @@ import os
 import sqlite3
 import threading
 import mcsm
-from logger_ import Logger_
+from logger import Logger
 import random
 import re
 
 app = Flask(__name__)
 
-logger_ = Logger_()
+logger = Logger()
 
 app.config['MAIL_SERVER'] = 'smtp.yeah.net'
 app.config['MAIL_PORT'] = 25
@@ -116,7 +116,7 @@ def register_user():
         if uuid:
             cursor.execute(
                 'INSERT INTO users (username, password, uuid) VALUES (?, ?)', (email, hashed_password, uuid))
-            logger_.info(f"用户 {email} 执行注册成功")
+            logger.info(f"用户 {email} 执行注册成功")
             msg = Message('【ShitCloud】注册激活',
                           sender='ShitCloud@com.cn', recipients=[email])
             mail.html = f'''
@@ -224,7 +224,7 @@ def login_user():
             token = secrets.token_hex(16)
             cursor.execute(
                 'UPDATE users SET token=? WHERE username=?', (token, username))
-            logger_.info(f"用户 {username} 执行登录成功")
+            logger.info(f"用户 {username} 执行登录成功")
             return jsonify({'message': '登录成功', 'points': user[0], 'token': token}), 200
         else:
             return jsonify({'error': '账号或密码错误'}), 401
@@ -257,7 +257,7 @@ def check_in():
 
                 cursor.execute('UPDATE users SET last_sign=?, points=? WHERE username=?',
                                (datetime.now(), points + pp, username))
-                logger_.info(f"用户 {username} 执行签到操作，获取积分 {pp}")
+                logger.info(f"用户 {username} 执行签到操作，获取积分 {pp}")
                 return jsonify({'message': '签到成功', 'points': points + pp}), 200
             else:
                 return jsonify({'error': '用户不存在'}), 404

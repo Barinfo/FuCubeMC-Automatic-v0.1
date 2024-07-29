@@ -4,13 +4,13 @@ import threading
 import os
 
 
-class Logger_:
+class Logger:
     def __init__(self, log_file_prefix=os.path.join(os.path.dirname(__file__), 'logs')):
         os.makedirs(log_file_prefix, exist_ok=True)
         self.log_file = os.path.join(
             log_file_prefix, f"{datetime.now().strftime('%Y-%m-%d')}.log")
         self.logger = logging.getLogger("Custom Logger")
-        self.logger.setLevel(logging.INFO)
+        self.logger.setLevel(logging.DEBUG)
         # 创建一个控制台输出的handler，并设置级别为WARN
         console_handler = logging.StreamHandler()
         console_handler.setLevel(logging.WARN)
@@ -36,7 +36,7 @@ class Logger_:
         with self.lock:
             self.logger.info(message)
 
-    def warning(self, message):
+    def warnin(self, message):
         with self.lock:
             self.logger.warning(message)
 

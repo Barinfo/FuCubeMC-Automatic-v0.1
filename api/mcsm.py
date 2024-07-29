@@ -1,7 +1,7 @@
 import requests
-from logger_ import Logger_
+from logger import Logger
 
-logger_ = Logger_()
+logger = Logger()
 def create_user(url, apikey, username, password, permission=1):
         """
         创建用户并返回是否成功的布尔值。
@@ -29,13 +29,13 @@ def create_user(url, apikey, username, password, permission=1):
     
         try:
             response = requests.post(api_url, data=data, headers=headers)
-            logger_.debug(response.text)
+            logger.debug(response.text)
             if response.status_code == 200:
                 return response.json()["data"]["uuid"]
             else:
-                logger_.error(f"Failed to create user. Status code: {response.status_code}")
+                logger.error(f"Failed to create user. Status code: {response.status_code}")
                 return False
         except requests.exceptions.RequestException as e:
-            logger_.error(f"Exception occurred in Mcsm Create User: {e}")
+            logger.error(f"Exception occurred in Mcsm Create User: {e}")
             return False
     
