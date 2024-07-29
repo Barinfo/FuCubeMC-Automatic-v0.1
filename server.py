@@ -1,19 +1,16 @@
+from flask import Flask, send_from_directory, abort
 from flask import Flask, request, jsonify
 from flask_mail import Mail, Message
 from datetime import datetime
-from until import Logger, AccountVerification, DBConnection, is_email
+from until import Logger, AccountVerification, DBConnection, is_email, Mcsm
 import secrets
 import random
 import ujson as json
 import os
-import mcsm
 import random
 import bcrypt
 
 app = Flask(__name__)
-
-logger = Logger()
-Ver = AccountVerification()
 
 app.config['MAIL_SERVER'] = 'smtp.yeah.net'
 app.config['MAIL_PORT'] = 25
@@ -26,6 +23,10 @@ mail = Mail(app)
 
 with open(os.path.join(os.path.dirname(__file__), 'config.json'), 'r') as file:
     config = json.load(file)
+
+logger = Logger()
+Ver = AccountVerification()
+mcsm = Mcsm(config["mcsm"]["url"], config["mcsm"]["apikey"], logger)
 
 with DBConnection() as cursor:
     cursor.execute('''
@@ -41,13 +42,41 @@ with DBConnection() as cursor:
         );
     ''')
 
+app = Flask(__name__, static_folder='templates')
+
+
+@app.route('/<path:filename>')
+def serve_static(filename):
+    if '.' in filename and filename.rsplit('.', 1)[-1].lower() != 'html':
+        try:
+            return send_from_directory(app.static_folder, filename)
+        except FileNotFoundError:
+            abort(404)
+
+    html_filename = f'{filename}.html'
+    try:
+        return send_from_directory(app.static_folder, html_filename)
+    except FileNotFoundError:
+        abort(404)
+
+
+@app.route('/')
+def home():
+    return send_from_directory(app.static_folder, 'index.html')
+
+
+if __name__ == '__main__':
+    with open(os.path.join(os.path.dirname(__file__), 'config.json'), 'r') as file:
+        config = json.load(file)
+    app.run(host='0.0.0.0', port=config['port'], threaded=True)
+
 
 @app.route('/active', methods=['GET'])
 def _():
     vid = request.args.get('id')
     if Ver.verify_id(vid):
-        mcsm.update_permission(
-            config['mcsm']['url'], config['mcsm']['apikey'], cursor.execute('SELECT uuid FROM users WHERE email=?', (Ver.get_email(vid),)).fetchone()[0], 1)
+        mcsm.update_permission(cursor.execute(
+            'SELECT uuid FROM users WHERE email=?', (Ver.get_email(vid),)).fetchone()[0], 1)
         return '''
     <!DOCTYPE html>
 <html lang="en">
@@ -93,8 +122,7 @@ def register_user():
     with DBConnection() as cursor:
         if cursor.execute('SELECT email FROM users WHERE email=?', (email,)).fetchone():
             return jsonify({'error': '邮箱已被注册'}), 400
-        uuid = mcsm.create_user(
-            config['mcsm']['url'], config['mcsm']['apikey'], email, password, -1)
+        uuid = mcsm.create_user(email, password, -1)
         if uuid:
             cursor.execute(
                 'INSERT INTO users (email, password, uuid) VALUES (?, ?)', (email, hashed_password, uuid))

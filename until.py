@@ -1,11 +1,13 @@
 import logging
 from datetime import datetime
 from typing import Union
+import ujson as json
 import threading
 import os
 import uuid
 import sqlite3
 import re
+import requests
 
 
 def is_email(email: str) -> bool:
@@ -184,3 +186,73 @@ class AccountVerification:
             )
             result = cursor.fetchone()
         return result['email']
+
+
+class Mcsm:
+    def __init__(self, url, apikey, logger) -> None:
+        self.logger = logger
+        self.url = url
+        self.apikey = apikey
+
+    def create_user(self, username, password, permission=1):
+        """
+        创建用户并返回是否成功的布尔值。
+
+        参数:
+        url: API的基础URL
+        apikey: API密钥
+        username: 用户名
+        password: 密码
+        permission: 用户权限，默认为1（普通权限）
+
+        返回:
+        bool: 用户是否成功创建（True表示成功，False表示失败）
+        """
+        api_url = f"{self.url}/api/auth?apikey={self.apikey}"
+        data = {
+            'username': username,
+            'password': password,
+            'permission': permission,
+        }
+        headers = {
+            'x-requested-with': 'xmlhttprequest'
+        }
+
+        try:
+            response = requests.post(api_url, data=data, headers=headers)
+            if response.status_code == 200:
+                return response.json()["data"]["uuid"]
+            else:
+                self.logger.error(
+                    f"Failed to create user. Status code: {response.status_code}")
+                return False
+        except requests.exceptions.RequestException as e:
+            self.logger.error(f"Exception occurred in Mcsm Create User: {e}")
+            return False
+
+    def update_permission(self, uuid: str, permission=int):
+        """
+        更新用户的权限并返回是否成功的布尔值。
+
+        参数:
+        url: API的基础URL
+        apikey: API密钥
+        uuid: 用户的UUID
+        permission: 用户的新权限
+
+        返回:
+        bool: 用户权限是否成功更新（True表示成功，False表示失败）
+        """
+        api_url = f"{self.url}/api/auth?apikey={self.apikey}"
+        data = {
+            'uuid': uuid,
+            'config': {
+                'permission': permission
+            }
+        }
+        response = requests.put(api_url, data=data, headers={
+            'Content-Type': 'application/json; charset=utf-8',
+            'X-Requested-With': 'XMLHttpRequest'
+        })
+        redata = json.loads(response.text)
+        return redata["data"]

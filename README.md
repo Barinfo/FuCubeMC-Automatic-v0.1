@@ -4,6 +4,13 @@
 
 An automatic controller for MCSManager
 
+# 启动全部服务
+
+```shell
+python server.py
+```
+
+
 ## 没想好写什么介绍 后续补充
 
 本项目制作中，使用后果自负！
