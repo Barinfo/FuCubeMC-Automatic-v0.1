@@ -2,4 +2,5 @@ flask
 ujson
 bcrypt
 requests
-sqlitepool
+DBUtils
+flask_mail

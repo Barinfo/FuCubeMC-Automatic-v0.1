@@ -1,34 +1,56 @@
-import sqlite3
 import bcrypt
 from flask import Flask, request, jsonify
+from flask_mail import Mail, Message
 from datetime import datetime
 import secrets
 import random
 import ujson as json
 import os
-import sqlitepool
+from DBUtils.PooledDB import PooledDB
+import sqlite3
+import threading
 import mcsm
-import logger
+from logger import Logger
+
+
 
 logger = Logger()
 
 app = Flask(__name__)
 
+
 with open(os.path.join(os.path.dirname(__file__), 'config.json'), 'r') as file:
     config = json.load(file)
 
 class DBConnection:
+    _lock = threading.Lock()
+    _pool = None
+
     def __init__(self):
-        self.pool = sqlitepool.ConnectionPool('sqlite:///users.db', maxconnections=5)
+        if DBConnection._pool is None:
+            with DBConnection._lock:
+                if DBConnection._pool is None:
+                    DBConnection._pool = PooledDB(
+                        creator=sqlite3,
+                        maxusage=None,
+                        maxconnections=5,
+                        blocking=True,
+                        setsession=[],
+                        ping=0,
+                        closeable=False,
+                        threadlocal=None,
+                        database='users.db',
+                        check_same_thread=False
+                    )
+        self.conn = DBConnection._pool.connection()
+        self.cursor = self.conn.cursor()
 
     def __enter__(self):
-        self.conn = self.pool.getconn()
-        self.cursor = self.conn.cursor()
         return self.cursor
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.conn.commit()
-        self.pool.putconn(self.conn)
+        self.conn.close()
 
 
 with DBConnection() as cursor:

@@ -1,22 +1,5 @@
-from flask import Flask, request, jsonify
-from flask_mail import Mail, Message
-from itsdangerous import URLSafeTimedSerializer
-from werkzeug.security import generate_password_hash
-import random
-import string
 
-app = Flask(__name__)
 
-# 配置邮件服务
-app.config['MAIL_SERVER'] = '?'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = '?'
-app.config['MAIL_PASSWORD'] = '?'
-app.config['SECRET_KEY'] = '?'
-
-mail = Mail(app)
-ts = URLSafeTimedSerializer(app.config["SECRET_KEY"])
 
 @app.route('/api/register', methods=['POST'])
 def register():
