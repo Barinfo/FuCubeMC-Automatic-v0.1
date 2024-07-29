@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from typing import Optional, Union
+from typing import Union
 import threading
 import os
 import uuid
@@ -31,7 +31,7 @@ class DBConnection:
                 if not hasattr(cls, '_instance'):
                     cls._instance = super(DBConnection, cls).__new__(cls)
                     cls._instance.conn = sqlite3.connect(
-                        os.path.join('api', 'users.db'))
+                        os.path.join(os.path.dirname(__file__), 'users.db'))
                     cls._instance.conn.row_factory = sqlite3.Row
         return cls._instance
 
@@ -46,8 +46,10 @@ class DBConnection:
         return self.get_cursor()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.conn.commit()
-        self.conn.close()
+        if exc_type is None:
+            self.conn.commit()
+        else:
+            self.conn.rollback()
 
 
 class Logger:
@@ -164,7 +166,7 @@ class AccountVerification:
             )
             result = cursor.fetchone()
         return result and result['verified'] == 1
-    
+
     def get_email(self, vid: Union[str, int]) -> str:
         """
         获取给定的vid的邮箱
