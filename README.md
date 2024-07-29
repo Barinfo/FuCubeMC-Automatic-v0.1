@@ -10,6 +10,8 @@ An automatic controller for MCSManager
 python server.py
 ```
 
+# [`config.json`说明](config.md)
+
 # [API Doc](API.md)
 
 ## 没想好写什么介绍 后续补充
