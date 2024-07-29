@@ -34,41 +34,91 @@
 
 <div class="container" id="login">
 	<div class="row justify-content-center">
-	<div class="col-lg-8">
-	  <div class="login">
+		<div class="col-lg-8">
+			<div class="login">
+				<h2>FuCube注册</h2>
+				<!-- Registration form -->
+				<from id="registration-form">
+					<div class="form-group">
+						<input type="email" class="form-control" id="email" placeholder="电子邮箱" required>
+					</div>
+					<div class="form-group">
+						<input type="password" class="form-control" id="password" placeholder="密码" required>
+					</div>
+					<div class="form-group">
+						<input type="password" class="form-control" id="confirm-password" placeholder="确认密码" required>
+					</div>
+					<script src="https://www.recaptcha.net/recaptcha/api.js" async defer></script>
+					<!-- <div class="form-group">
+						<input type="text" class="form-control" id="captcha" placeholder="通行码" required>
+					</div> -->
+					<div class="g-recaptcha" data-callback="robotVerified" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></div>
+					<!-- 这段可以跑一下试试 还没试过 ↑  参考文档 https://www.jianshu.com/p/a0c049795014 -->
+					<div class="form-check">
+						<label class="already-have-account"><a href="/login">已有账号? 登录</a></label>
+					</div>
+					
+					<br>
+					<button type="submit" class="btn btn-lg btn-block btn-success" id="submit-btn">注册</button>
+				</from>
+				<!-- End Registration form -->
 
-		<h2>注册</h2>
-		
-		<!-- Registration form -->
-		<form id="registration-form" action="api/reg" method="post">
-			<div class="form-group">
-				<input type="email" class="form-control" id="email" placeholder="电子邮箱" required>
 			</div>
-			<div class="form-group">
-				<input type="password" class="form-control" id="password" placeholder="密码" required>
-			</div>
-			<div class="form-group">
-				<input type="password" class="form-control" id="confirm-password" placeholder="确认密码" required>
-			</div>
-			<script src="https://www.recaptcha.net/recaptcha/api.js" async defer></script>
-			<!-- <div class="form-group">
-				<input type="text" class="form-control" id="captcha" placeholder="通行码" required>
-			</div> -->
-			<div class="g-recaptcha" data-callback="robotVerified" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></div>
-			<!-- 这段可以跑一下试试 还没试过 ↑  参考文档 https://www.jianshu.com/p/a0c049795014 -->
-			<div class="form-check">
-				<label class="already-have-account"><a href="/login">已有账号? 登录</a></label>
-			</div>
-			
-			<br>
-			<button type="submit" class="btn btn-lg btn-block btn-success" id="submit-btn">注册</button>
-		</form>
-		<!-- End Registration form -->
-
-	  </div>
-	  <span style="color:white;">Copyright &copy; 2024 FuCubeCloud 芙方云 All rights reserved.</span> 
-	</div>
+			<span style="color:white;">Copyright &copy; 2024 FuCubeCloud 芙方云 All rights reserved.</span> 
+		</div>
 	</div>
 </div>
+<script>
+// jQuery ready function to ensure the DOM is fully loaded before executing any code
+$(document).ready(function() {
+    // Attach a click event handler to the submit button
+    $('#submit-btn').click(function(event) {
+        // Prevent the default form submission behavior
+        event.preventDefault();
+
+        // Get values from the input fields
+        var email = $('#email').val();
+        var password = $('#password').val();
+        var confirmPassword = $('#confirm-password').val();
+        // Assuming the reCAPTCHA token is stored in a global variable called 'token'
+        var token = grecaptcha.getResponse();
+
+        // Check if any of the fields are empty or if passwords do not match
+        if (!email || !password || !confirmPassword || !token || password !== confirmPassword) {
+            swal("Error", "请填写所有字段！", "error");
+            return;
+        }
+
+        // Prepare the data to send
+        var data = {
+            email: email,
+            password: password,
+            'g-recaptcha-response': token
+        };
+
+        // Send an AJAX request
+		$.ajax({
+			url: '/api/reg', // Replace this with your actual registration endpoint
+			type: 'POST',
+			data: data,
+			dataType: 'json', // Specify that you expect JSON data back
+			success: function(response, textStatus, xhr) {
+				// Check the HTTP status code from the response object
+				if (xhr.status === 200) {
+					// If the HTTP status is 200, check for the 'message' key in the response
+					swal("Success", response.message, "success");
+				} else {
+					// If the HTTP status is not 200, check for the 'error' key in the response
+					swal("Error", response.error, "error");
+				}
+			},
+			error: function(xhr, status, error) {
+				// Handle any errors that occur during the request
+				swal("Error", "An unexpected error occurred: " + error, "error");
+			}
+		});
+    });
+});
+</script>
 </body>
 </html>
