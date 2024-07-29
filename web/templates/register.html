@@ -66,7 +66,7 @@
 			</div>
 			
 			<br>
-			<button type="submit" class="btn btn-lg btn-block btn-success" disabled id="submit-btn">注册</button>
+			<button type="submit" class="btn btn-lg btn-block btn-success" id="submit-btn">注册</button>
 		</form>
 		<!-- End Registration form -->
 
@@ -85,7 +85,7 @@ $(document).ready(function(){
         if(email){
             // 发送AJAX请求获取验证码
             $.ajax({
-                url: '/api/get-verification-code', // 假设这是你的后端获取验证码的URL
+                url: 'http://127.0.0.1:5000/api/send_verification_code', // 假设这是你的后端获取验证码的URL
                 type: 'GET',
                 data: {email: email},
                 success: function(response){
@@ -113,7 +113,7 @@ $(document).ready(function(){
 
         // 发送AJAX请求到后端进行注册
         $.ajax({
-            url: '/api/register', // 假设这是你的后端注册URL
+            url: 'http://127.0.0.1:5000/api/register', // 假设这是你的后端注册URL
             type: 'POST',
             data: {
                 'username': username,
