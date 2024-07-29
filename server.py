@@ -43,7 +43,7 @@ with DBConnection() as cursor:
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             uuid TEXT NOT NULL,
-            eamil TEXT NOT NULL UNIQUE,
+            email TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL,
             ban TEXT DEFAULT 'false',
             points INTEGER DEFAULT 0,
