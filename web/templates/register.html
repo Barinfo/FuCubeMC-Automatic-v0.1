@@ -1,29 +1,69 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <meta lang="zh-cn">
-        <title>注册 - FuCube公益面板</title>
-    </head>
-    <body>
-        <div class="nav-main">
-            <!-- 导航栏 -->
-        </div>
-        <div class="content-main">
-            <!-- 中间应该放的内容 -->
-        </div>
-    </body>
-    <footer>
-        <!-- 底部的一堆乱七八糟歪比巴卜 -->
-        <div class="bottom-main">
-            <div class="bottom-link">
-                <span class="bottom-link-span">
-                    友情链接：
-                </span>
-            </div>
-            <div class="bottom-copyrighticp">
-                <span class="bottom-copyrighticp-span">版权所有 FuCubeCloud 芙方云 2024 保留所有权利。</span>
-            </div>
-        </div>
-    </footer>
+<!doctype html>
+<html lang="en">
+<head>
+<!-- Required meta tags -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="bootstrap.min.css">
+
+<!-- Loding font -->
+<link href="https://fonts.googleapis.com/css?family=Montserrat:300,700" rel="stylesheet">
+
+<!-- Custom Styles -->
+<link rel="stylesheet" type="text/css" href="./register.css">
+
+<title>注册 - FuCubeCloud</title>
+</head>
+<body>
+
+<!-- Backgrounds -->
+
+<div id="login-bg" class="container-fluid">
+
+  <div class="bg-img"></div>
+  <!-- <div class="bg-color"></div> -->
+</div>
+
+<!-- End Backgrounds -->
+
+<div class="container" id="login">
+	<div class="row justify-content-center">
+	<div class="col-lg-8">
+	  <div class="login">
+
+		<h2>注册</h2>
+		
+		<!-- Registration form -->
+		<form>
+			<div class="form-group">
+				<input type="text" class="form-control" id="username" placeholder="用户名">
+			</div>
+			<div class="form-group">
+				<input type="email" class="form-control" id="email" placeholder="电子邮箱">
+			</div>
+			<div class="form-group">
+				<input type="password" class="form-control" id="password" placeholder="密码">
+			</div>
+			<div class="form-group">
+				<input type="password" class="form-control" id="confirm-password" placeholder="确认密码">
+			</div>
+			
+			<div class="form-check">
+				<label class="already-have-account"><a href="/login">已有账号? 登录<a></label>
+			</div>
+			
+			<br>
+			<button type="submit" class="btn btn-lg btn-block btn-success">注册</button>
+		</form>
+		<!-- End Registration form -->
+
+	  </div>
+	  <span style="color:white;">Copyright &copy; 2024 FuCubeCloud 芙方云 All rights reserved.</span> 
+	</div>
+	</div>
+</div>
+
+</body>
 </html>
