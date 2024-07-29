@@ -88,20 +88,39 @@ def active_account():
 
 @app.route('/api/reg', methods=['POST'])
 def register_user():
-    data = request.args.to_dict()
+    data = request.values.to_dict(flat=True)
+    logger.debug(data)
     password = data.get('password')
     email = data.get('email')
+    confirm_password = data.get('confirmPassword')
+    gRecaptchaResponse = data.get('g-recaptcha-response')
+    if not all([email, password, confirm_password, gRecaptchaResponse]):
+                # 创建一个字典来存储缺失的参数
+        missing_params = []
+        if email is None:
+            missing_params.append('email')
+        if password is None:
+            missing_params.append('password')
+        if confirm_password is None:
+            missing_params.append('confirm_password')
+        if gRecaptchaResponse is None:
+            missing_params.append('g-recaptcha-response')
+
+        # 构造错误消息
+        error_message = '缺少以下参数: ' + ', '.join(missing_params)
+        
+        # 返回带有详细错误信息的 JSON 响应
+        return jsonify({'error': error_message}), 400
+
 
     if not is_email(email):
         return jsonify({'error': '邮箱格式错误'}), 400
-
-    confirm_password = data.get('confirmPassword')
-    hashed_password = bcrypt.hashpw(password.encode('utf-8'), load_salt())
-    if not all([email, password, confirm_password]):
-        return jsonify({'error': '缺少传参'}), 400
-
+    
     if password != confirm_password:
         return jsonify({'error': '两次输入的密码不一样'}), 400
+
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), load_salt())
+
 
     with DBConnection() as cursor:
         if cursor.execute('SELECT email FROM users WHERE email=?', (email,)).fetchone():

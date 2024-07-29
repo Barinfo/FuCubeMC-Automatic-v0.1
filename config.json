@@ -7,6 +7,7 @@
     "hostname": "0.0.0.0",
     "mcsm": {
         "apikey": "ba05eb2aa13b4e32ac8439bb4989c8fe",
-        "url": "http://s1.rancloud.xyz:23333"
-    }
+        "url": "http:\/\/s1.rancloud.xyz:23333"
+    },
+    "salt": "$2b$12$oNO.Jq8O.iuEPsRP9Rm8Nu"
 }
