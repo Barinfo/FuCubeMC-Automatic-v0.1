@@ -21,7 +21,7 @@ def is_email(email: str) -> bool:
         r'139\.com|' \
         r'189\.com' \
         r')$'
-    return bool(re.match(e, email))
+    return bool(re.match(e, str(email)))
 
 
 class DBConnection:
