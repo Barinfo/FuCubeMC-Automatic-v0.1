@@ -21,6 +21,7 @@ def create_user(url, apikey, username, password, permission=1):
             'username': username,
             'password': password,
             'permission': permission,
+            'apikey': apikey
         }
         headers={
             'x-requested-with': 'xmlhttprequest'

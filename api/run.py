@@ -85,6 +85,11 @@ with DBConnection() as cursor:
         );
     ''')
 
+@app.route('/active', methods=['GET'])
+def _():
+    id = request.args.get('id')
+    pass
+    #这里进行链接验证，别动
 
 @app.route('/api/reg', methods=['POST'])
 def register_user():
@@ -114,8 +119,89 @@ def register_user():
             logger_.info(f"用户 {email} 执行注册成功")
             msg = Message('【ShitCloud】注册激活',
                           sender='ShitCloud@com.cn', recipients=[email])
-            mail.html = "<h1>Hello</h1><p>This is an HTML email.</p>"# 这里别动，我还在写
-            mail.body = "This is an HTML email. Please view it in a client that supports HTML."
+            mail.html = f'''
+<table class="main" width="100%" cellpadding="0" cellspacing="0" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; border-radius: 3px; background-color: #fff; margin: 0; border: 1px 
+ solid #e9e9e9;
+" bgcolor=" #fff">
+    <tbody>
+        <tr style=" font-family: 'Helvetica Neue',
+Helvetica,
+Arial,
+sans-serif;
+box-sizing: border-box;
+font-size: 14px;
+margin: 0;
+">
+            <td class=" alert alert-warning" style=" font-family: 'Helvetica Neue',
+Helvetica,
+Arial,
+sans-serif;
+box-sizing: border-box;
+font-size: 16px;
+vertical-align: top;
+color: #fff;
+font-weight: 500;
+text-align: center;
+border-radius: 3px 3px 0 0;
+background-color: #009688;
+margin: 0;
+padding: 20px;
+" align=" center" bgcolor=" #FF9F00" valign=" top">激活FuCube账户</td>
+        </tr>
+        <tr style=" font-family: 'Helvetica Neue',
+Helvetica,
+Arial,
+sans-serif;
+box-sizing: border-box;
+font-size: 14px;
+margin: 0;
+">
+            <td class=" content-wrap" style=" font-family: 'Helvetica Neue',
+Helvetica,
+Arial,
+sans-serif;
+box-sizing: border-box;
+font-size: 14px;
+vertical-align: top;
+margin: 0;
+padding: 20px;
+" valign=" top">
+                <table width=" 100%" cellpadding=" 0" cellspacing=" 0" style=" font-family: 'Helvetica Neue',
+Helvetica,
+Arial,
+sans-serif;
+box-sizing: border-box;
+font-size: 14px;
+margin: 0;
+">
+                    <tbody>
+                        <tr style=" font-family: 'Helvetica Neue',
+Helvetica,
+Arial,
+sans-serif;
+box-sizing: border-box;
+font-size: 14px;
+margin: 0;
+">
+                            <td class=" content-block" style=" font-family: 'Helvetica 
+ Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">亲爱的<strong style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;"><a href="mailto:{email}" rel="noopener" target="_blank">{email}</a></strong>：</td>
+                        </tr>
+                        <tr style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                            <td class="content-block" style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">感谢您注册FuCube,请点击下方按钮完成账户激活。</td>
+                        </tr>
+                        <tr style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                            <td class="content-block" style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top"><a href="https://{{active?id=xxx}}" class="btn-primary" style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; color: #FFF; text-decoration: none; line-height: 2em; font-weight: bold; text-align: center; cursor: pointer; display: inline-block; border-radius: 5px; text-transform: capitalize; background-color: #009688; margin: 0; border-color: #009688; border-style: solid; border-width: 10px 20px;" rel="noopener" target="_blank">激活账户</a></td>
+                        </tr>
+                        <tr style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
+                            <td class="content-block" style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">感谢您选择FuCube。</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </tbody>
+</table>
+            '''
             mail.send(msg)
             return jsonify({'message': '注册成功，请前往邮箱验证'}), 201
         else:
