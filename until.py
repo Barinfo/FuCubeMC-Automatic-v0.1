@@ -1,6 +1,6 @@
 import datetime
 import logging
-from datetime import datetime
+import datetime
 from typing import Union
 import ujson as json
 import threading
