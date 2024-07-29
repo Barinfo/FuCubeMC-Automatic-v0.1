@@ -130,7 +130,7 @@ def register_user():
         logger.info(f"用户 {email} 执行注册成功")
         vid = Ver.apply_verification_id(email)
         msg = Message('【FuCube】注册激活',
-                        sender='FuCube@com.cn', recipients=[email])
+                        sender='barinfo@yeah.net', recipients=[email])
         msg.html = f'''
 <table class="main" width="100%" cellpadding="0" cellspacing="0" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; border-radius: 3px; background-color: #fff; margin: 0; border: 1px 
 solid #e9e9e9;
