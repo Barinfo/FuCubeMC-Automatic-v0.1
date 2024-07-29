@@ -20,10 +20,13 @@
         }
 
         .nav-main {
-            background-color: #007BFF;
+            background-color: rgba(0, 0, 0, 0);
             color: white;
             padding: 10px 0;
             text-align: center;
+            display: flex;
+            justify-content: flex-start;
+            padding-left: 10px; /* 添加一些内边距使得内容不会贴边 */
         }
         .nav-main a {
             color: white;
@@ -47,7 +50,7 @@
         .bottom-main {
             background-color: #333;
             color: white;
-            padding: 20px 0;
+            padding: 15px 0;
             text-align: center;
             position: fixed;
             bottom: 0;
@@ -55,7 +58,7 @@
             width: 100%;
         }
         .bottom-link {
-            margin-bottom: 10px;
+            margin-bottom: 0px;
         }
         .bottom-link-span {
             font-weight: bold;
@@ -69,6 +72,10 @@
 
         /* 响应式设计 */
         @media (max-width: 600px) {
+            .nav-main {
+                flex-direction: column;
+                align-items: flex-start;
+            }
             .nav-main a {
                 display: block;
                 margin: 5px 0;
@@ -83,16 +90,11 @@
         <a href="/login">登录</a>
         <a href="/panel">面板</a>
     </div>
-    <div class="content-main">
-        开发中...
-    </div>
     <footer>
         <!-- 底部的一堆乱七八糟歪比巴卜 -->
         <div class="bottom-main">
             <div class="bottom-link">
-                <span class="bottom-link-span">
-                    友情链接：
-                </span>
+                <span class="bottom-link-span">友情链接：</span>
             </div>
             <div class="bottom-copyrighticp">
                 <span class="bottom-copyrighticp-span">版权所有 FuCubeCloud 芙方云 2024 保留所有权利。</span>
