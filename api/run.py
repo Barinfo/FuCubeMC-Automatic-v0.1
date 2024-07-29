@@ -1,26 +1,24 @@
 from flask import Flask, request, jsonify
 from flask_mail import Mail, Message
 from datetime import datetime
-from logger import Logger
+from until import Logger, AccountVerification, DBConnection, is_email
 import secrets
 import random
 import ujson as json
 import os
-import sqlite3
-import threading
 import mcsm
 import random
 import bcrypt
-import re
 
 app = Flask(__name__)
 
 logger = Logger()
+Ver = AccountVerification()
 
 app.config['MAIL_SERVER'] = 'smtp.yeah.net'
 app.config['MAIL_PORT'] = 25
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'barinfo@yeah.net'
+app.config['MAIL_email'] = 'barinfo@yeah.net'
 app.config['MAIL_PASSWORD'] = 'TQCSAJGFEWKOPJGM'
 app.config['SECRET_KEY'] = '?'
 
@@ -28,49 +26,6 @@ mail = Mail(app)
 
 with open(os.path.join(os.path.dirname(__file__), 'config.json'), 'r') as file:
     config = json.load(file)
-
-
-def is_email(email):
-    e = r'^[\w.-]+@(' \
-        r'qq\.com|' \
-        r'126\.com|' \
-        r'163\.com|' \
-        r'yeah\.net|' \
-        r'outlook\.com|' \
-        r'139\.com|' \
-        r'189\.com' \
-        r')$'
-    return bool(re.match(e, email))
-
-
-class DBConnection:
-    _lock = threading.Lock()
-    _connection = None
-
-    def __new__(cls):
-        if not hasattr(cls, '_instance'):
-            with cls._lock:
-                if not hasattr(cls, '_instance'):
-                    cls._instance = super(DBConnection, cls).__new__(cls)
-                    cls._instance.conn = sqlite3.connect(
-                        os.path.join('api', 'users.db'))
-                    cls._instance.conn.row_factory = sqlite3.Row
-        return cls._instance
-
-    def get_cursor(self):
-        return self.conn.cursor()
-
-    def close(self):
-        if self.conn:
-            self.conn.close()
-
-    def __enter__(self):
-        return self.get_cursor()
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.conn.commit()
-        self.conn.close()
-
 
 with DBConnection() as cursor:
     cursor.execute('''
@@ -89,9 +44,33 @@ with DBConnection() as cursor:
 
 @app.route('/active', methods=['GET'])
 def _():
-    id = request.args.get('id')
-    pass
-    # 这里进行链接验证，别动
+    vid = request.args.get('id')
+    if Ver.verify_id(vid):
+        mcsm.update_permission(
+            config['mcsm']['url'], config['mcsm']['apikey'], cursor.execute('SELECT uuid FROM users WHERE email=?', (Ver.get_email(vid),)).fetchone()[0], 1)
+        return '''
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>验证结果</title>
+</head>
+<body>
+    <h1>验证成功</h1>
+</body>
+</html>'''
+    else:
+        return '''
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>验证结果</title>
+</head>
+<body>
+    <h1>验证失败</h1>
+</body>
+</html>'''
 
 
 @app.route('/api/reg', methods=['POST'])
@@ -112,14 +91,15 @@ def register_user():
         return jsonify({'error': '两次输入的密码不一样'}), 400
 
     with DBConnection() as cursor:
-        if cursor.execute('SELECT email FROM users WHERE username=?', (email,)).fetchone():
+        if cursor.execute('SELECT email FROM users WHERE email=?', (email,)).fetchone():
             return jsonify({'error': '邮箱已被注册'}), 400
         uuid = mcsm.create_user(
-            config['mcsm']['url'], config['mcsm']['apikey'], email, password)
+            config['mcsm']['url'], config['mcsm']['apikey'], email, password, -1)
         if uuid:
             cursor.execute(
-                'INSERT INTO users (username, password, uuid) VALUES (?, ?)', (email, hashed_password, uuid))
+                'INSERT INTO users (email, password, uuid) VALUES (?, ?)', (email, hashed_password, uuid))
             logger.info(f"用户 {email} 执行注册成功")
+            vid = Ver.apply_verification_id(email)
             msg = Message('【ShitCloud】注册激活',
                           sender='ShitCloud@com.cn', recipients=[email])
             mail.html = f'''
@@ -193,7 +173,7 @@ margin: 0;
                             <td class="content-block" style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">感谢您注册FuCube,请点击下方按钮完成账户激活。</td>
                         </tr>
                         <tr style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
-                            <td class="content-block" style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top"><a href="https://{{active?id=xxx}}" class="btn-primary" style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; color: #FFF; text-decoration: none; line-height: 2em; font-weight: bold; text-align: center; cursor: pointer; display: inline-block; border-radius: 5px; text-transform: capitalize; background-color: #009688; margin: 0; border-color: #009688; border-style: solid; border-width: 10px 20px;" rel="noopener" target="_blank">激活账户</a></td>
+                            <td class="content-block" style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top"><a href="https://0.0.0.0/active?id={vid}" class="btn-primary" style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; color: #FFF; text-decoration: none; line-height: 2em; font-weight: bold; text-align: center; cursor: pointer; display: inline-block; border-radius: 5px; text-transform: capitalize; background-color: #009688; margin: 0; border-color: #009688; border-style: solid; border-width: 10px 20px;" rel="noopener" target="_blank">激活账户</a></td>
                         </tr>
                         <tr style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; margin: 0;">
                             <td class="content-block" style="font-family: ' Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; vertical-align: top; margin: 0; padding: 0 0 20px;" valign="top">感谢您选择FuCube。</td>
@@ -214,20 +194,22 @@ margin: 0;
 @app.route('/api/login', methods=['POST'])
 def login_user():
     data = request.json
-    username = data.get('username')
+    email = data.get('email')
     password = data.get('password')
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-    if not username or not password:
+    if not email or not password:
         return jsonify({'error': '缺少用户名或密码'}), 400
 
     with DBConnection() as cursor:
         user = cursor.execute(
-            'SELECT points FROM users WHERE username=? AND password=?', (username, hashed_password)).fetchone()
+            'SELECT points FROM users WHERE email=? AND password=?', (email, hashed_password)).fetchone()
         if user:
+            if not Ver.is_verified(email):
+                return jsonify({'error': '账号未激活'}), 401
             token = secrets.token_hex(16)
             cursor.execute(
-                'UPDATE users SET token=? WHERE username=?', (token, username))
-            logger.info(f"用户 {username} 执行登录成功")
+                'UPDATE users SET token=? WHERE email=?', (token, email))
+            logger.info(f"用户 {email} 执行登录成功")
             return jsonify({'message': '登录成功', 'points': user[0], 'token': token}), 200
         else:
             return jsonify({'error': '账号或密码错误'}), 401
@@ -236,13 +218,15 @@ def login_user():
 @app.route('/api/sign', methods=['POST'])
 def check_in():
     data = request.json
-    username = data.get('username')
+    email = data.get('email')
     token = data.get('token')
-    if username and token:
+    if email and token:
         with DBConnection() as cursor:
             user = cursor.execute(
-                'SELECT last_sign, points, token, ban FROM users WHERE username=?', (username,)).fetchone()
+                'SELECT last_sign, points, token, ban FROM users WHERE email=?', (email,)).fetchone()
             if user:
+                if not Ver.is_verified(email):
+                    return jsonify({'error': '账号未激活'}), 401
                 db_token, points, ban = user[2], user[1], user[3]
                 if db_token != token:
                     return jsonify({'error': '身份验证失败'}), 401
@@ -258,9 +242,9 @@ def check_in():
                 last = int(config['sign_point']['max'])
                 pp = random.randint(first, last)
 
-                cursor.execute('UPDATE users SET last_sign=?, points=? WHERE username=?',
-                               (datetime.now(), points + pp, username))
-                logger.info(f"用户 {username} 执行签到操作，获取积分 {pp}")
+                cursor.execute('UPDATE users SET last_sign=?, points=? WHERE email=?',
+                               (datetime.now(), points + pp, email))
+                logger.info(f"用户 {email} 执行签到操作，获取积分 {pp}")
                 return jsonify({'message': '签到成功', 'points': points + pp}), 200
             else:
                 return jsonify({'error': '用户不存在'}), 404
