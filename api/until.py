@@ -36,7 +36,11 @@ class DBConnection:
         return cls._instance
 
     def get_cursor(self):
+        if self.conn is None or not self.conn.open:
+            self.conn = sqlite3.connect(os.path.join('api', 'users.db'))
+            self.conn.row_factory = sqlite3.Row
         return self.conn.cursor()
+
 
     def close(self):
         if self.conn:
@@ -46,8 +50,10 @@ class DBConnection:
         return self.get_cursor()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.conn.commit()
-        self.conn.close()
+        if exc_type is None:
+            self.conn.commit()
+        else:
+            self.conn.rollback()
 
 
 class Logger:
