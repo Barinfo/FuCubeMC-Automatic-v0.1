@@ -5,7 +5,7 @@
     },
     "port": 80,
     "mcsm": {
-        "apikey": "5e46173b3600401387133c3724a4bd04",
-        "url": "s1.rancloud.xyz:23333"
+        "apikey": "ba05eb2aa13b4e32ac8439bb4989c8fe",
+        "url": "http://s1.rancloud.xyz:23333"
     }
 }

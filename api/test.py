@@ -8,4 +8,4 @@ import json
 with open(os.path.join(os.path.dirname(__file__), 'config.json'), 'r') as file:
     config = json.load(file)
 mcsm.create_user(url=config['mcsm']['url'], apikey=config['mcsm']['apikey'], 
-        username='Test', password='A12345678Aa')
+        username='text', password='A12345678Aa')
