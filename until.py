@@ -1,3 +1,4 @@
+import datetime
 import logging
 from datetime import datetime
 from typing import Union
@@ -55,13 +56,13 @@ class DBConnection:
 
 
 class Logger:
-    def __init__(self, log_file_prefix=os.path.join(os.path.dirname(__file__), 'logs')) -> None:
+    def __init__(self, log_file_prefix=os.path.join(os.path.dirname(__file__), 'logs')):
         os.makedirs(log_file_prefix, exist_ok=True)
-        self.log_file = os.path.join(
-            log_file_prefix, f"{datetime.now().strftime('%Y-%m-%d')}.log")
+        self.log_file_prefix = log_file_prefix
         self.logger = logging.getLogger("Custom Logger")
         self.logger.setLevel(logging.DEBUG)
-        # 创建一个控制台输出的handler，并设置级别为WARN
+
+        # 创建控制台输出的handler
         console_handler = logging.StreamHandler()
         console_handler.setLevel(logging.WARN)
         formatter = logging.Formatter(
@@ -69,32 +70,51 @@ class Logger:
         console_handler.setFormatter(formatter)
         self.logger.addHandler(console_handler)
 
-        # 创建一个文件输出的handler，并设置级别为DEBUG（记录所有级别）
-        file_handler = logging.FileHandler(self.log_file)
-        file_handler.setLevel(logging.DEBUG)
-        file_handler.setFormatter(formatter)
-        self.logger.addHandler(file_handler)
-
-        # 添加线程锁
+        # 初始化文件handler为None，以便在首次记录日志时创建
+        self.file_handler = None
+        self.current_log_date = None
         self.lock = threading.Lock()
 
+    def _ensure_log_file_created(self):
+        """确保日志文件在首次记录日志时创建，或在新的一天开始时创建新文件。"""
+        today = datetime.datetime.now().date()
+        if self.file_handler is None or today != self.current_log_date:
+            with self.lock:
+                if self.file_handler is not None and today != self.current_log_date:
+                    self.logger.removeHandler(self.file_handler)
+                    self.file_handler.close()
+
+                self.current_log_date = today
+                self.log_file = os.path.join(
+                    self.log_file_prefix, f"{today}.log")
+                self.file_handler = logging.FileHandler(self.log_file)
+                self.file_handler.setLevel(logging.DEBUG)
+                self.file_handler.setFormatter(logging.Formatter(
+                    '%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S'))
+                self.logger.addHandler(self.file_handler)
+
     def debug(self, message: str) -> None:
+        self._ensure_log_file_created()
         with self.lock:
             self.logger.debug(message)
 
     def info(self, message: str) -> None:
+        self._ensure_log_file_created()
         with self.lock:
             self.logger.info(message)
 
-    def warnin(self, message: str) -> None:
+    def warning(self, message: str) -> None:
+        self._ensure_log_file_created()
         with self.lock:
             self.logger.warning(message)
 
     def error(self, message: str) -> None:
+        self._ensure_log_file_created()
         with self.lock:
             self.logger.error(message)
 
     def critical(self, message: str) -> None:
+        self._ensure_log_file_created()
         with self.lock:
             self.logger.critical(message)
 
