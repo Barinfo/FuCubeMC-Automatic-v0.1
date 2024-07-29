@@ -15,19 +15,37 @@
             background-attachment: fixed;
             margin: 0;
             padding: 0;
-            padding-bottom: 80px;
             box-sizing: border-box;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 32%; /* 距离顶部 50% */
+            left: 8%; /* 距离左侧 10% */
+            transform: translateY(-50%); /* 垂直居中对齐 */
+            background: rgba(0, 0, 0, 0); /* 半透明黑色背景 */
+            padding: 20px; /* 内边距 */
+            border-radius: 10px; /* 圆角边框 */
+            color: white;
+            text-align: center;
+            z-index: 1;
+        }
+
+        .overlay h1 {
+            font-size: 5.2em; /* 字体大小 */
+            margin: 0;
         }
 
         .nav-main {
             background-color: rgba(0, 0, 0, 0);
             color: white;
             padding: 10px 0;
-            text-align: center;
-            display: flex;
-            justify-content: flex-start;
-            padding-left: 10px; /* 添加一些内边距使得内容不会贴边 */
+            text-align: left;
+            padding-left: 10px;
+            position: relative;
+            z-index: 1;
         }
+
         .nav-main a {
             color: white;
             text-decoration: none;
@@ -35,6 +53,7 @@
             padding: 5px 10px;
             border-radius: 5px;
         }
+
         .nav-main a:hover {
             background-color: rgba(255, 255, 255, 0.1);
         }
@@ -45,6 +64,8 @@
             padding: 20px;
             background-color: white;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            position: relative;
+            z-index: 1;
         }
 
         .bottom-main {
@@ -57,15 +78,19 @@
             left: 0;
             width: 100%;
         }
+
         .bottom-link {
             margin-bottom: 0px;
         }
+
         .bottom-link-span {
             font-weight: bold;
         }
+
         .bottom-copyrighticp {
             font-size: 0.9em;
         }
+
         .bottom-copyrighticp-span {
             display: block;
         }
@@ -73,9 +98,10 @@
         /* 响应式设计 */
         @media (max-width: 600px) {
             .nav-main {
-                flex-direction: column;
-                align-items: flex-start;
+                text-align: center;
+                padding-left: 0;
             }
+
             .nav-main a {
                 display: block;
                 margin: 5px 0;
@@ -84,6 +110,9 @@
     </style>
 </head>
 <body>
+    <div class="overlay">
+        <h1>FuCube公益面板</h1>
+    </div>
     <div class="nav-main">
         <!-- 导航栏 -->
         <a href="/reg">注册</a>
