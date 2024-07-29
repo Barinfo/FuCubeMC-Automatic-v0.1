@@ -23,7 +23,6 @@ def create_user(url, apikey, username, password, permission=1):
         'username': username,
         'password': password,
         'permission': permission,
-        'apikey': apikey
     }
     headers = {
         'x-requested-with': 'xmlhttprequest'
@@ -43,7 +42,7 @@ def create_user(url, apikey, username, password, permission=1):
         return False
 
 
-def update_permission(url, apikey, uuid, permission):
+def update_permission(url, apikey, uuid, permission=1):
     """
     更新用户的权限并返回是否成功的布尔值。
 
@@ -58,24 +57,35 @@ def update_permission(url, apikey, uuid, permission):
     """
     api_url = url + "/api/auth?apikey=" + apikey
     data = {
-        'username': uuid,
-        'password': password,
-        'permission': permission,
-        'apikey': apikey
-    }
+  "uuid": string, // UUID of the target user
+  "config": {
+    // target user info
+    "uuid": string,
+    "userName": string,
+    "loginTime": string,
+    "registerTime": string,
+    "instances": InstanceDetail[],  // user instances
+                                    // You can assign instances to users here
+    "permission": number,  // 1=User, 10=Admin, -1=Banned user
+    "apiKey": string,
+    "isInit": boolean,
+    "secret": string,
+    "open2FA": boolean,
+  }
+}
     headers = {
         'x-requested-with': 'xmlhttprequest'
     }
 
     try:
-        response = requests.post(api_url, data=data, headers=headers)
+        response = requests.put(api_url, data=data, headers=headers)
         logger.debug(response.text)
         if response.status_code == 200:
-            return response.json()["data"]["uuid"]
+            return True
         else:
             logger.error(
-                f"Failed to create user. Status code: {response.status_code}")
+                f"Failed to update user permission. Status code: {response.status_code}")
             return False
     except requests.exceptions.RequestException as e:
-        logger.error(f"Exception occurred in Mcsm Create User: {e}")
+        logger.error(f"Exception occurred in Mcsm Update User Permission: {e}")
         return False
