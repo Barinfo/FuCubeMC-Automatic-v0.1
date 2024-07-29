@@ -44,8 +44,8 @@ def send_verification_code():
     # session['verification_code'] = verification_code
 
     # 构建邮件内容
-    msg = Message('Verification Code', sender='jackcsa@outlook.com', recipients=[email])
-    msg.body = f'Your verification code is: {verification_code}'
+    msg = Message('noreply', sender='jackcsa@outlook.com', recipients=[email])
+    msg.body = f'<h3>FuCube - 您的验证码是:<span style="color:#66ccff"> {verification_code} </span></h3><br><p>不要将验证码告诉他人！如果您认为此注册请求不是您发出的，请忽略。</p>'
 
     # 发送邮件
     mail.send(msg)
