@@ -226,14 +226,41 @@ class Mcsm:
         try:
             response = requests.post(api_url, data=data, headers=headers)
             if response.status_code == 200:
-                return [True, response.json()["data"]["uuid"]]
+                self.logger.debug(f"User created successfully. Response: {response.json()}")
+                return [True, self.get_uuid(username)]
             else:
                 self.logger.error(
-                    f"Failed to create user. Status code: {response.status_code}")
+                    f"Failed to create user. Status code: {response.status_code}\nMessage: {response.json()['data']}")
                 return [False, response.json()["data"]]
         except requests.exceptions.RequestException as e:
             self.logger.error(f"Exception occurred in Mcsm Create User: {e}")
             return [False, e]
+    
+    def get_uuid(self, username: str)->str:
+        """
+        根据username获取uuid
+        """
+        api_url = f"{self.url}/api/auth/search?apikey={self.apikey}"
+        data = {
+            'userName': username,
+            'page': 1,
+            'page_size': 1
+            }
+        headers = {
+            'x-requested-with': 'xmlhttprequest'
+        }
+        try:
+            response = requests.get(api_url, data=data, headers=headers)
+            if response.status_code == 200:
+                self.logger.debug(f"User found uuid successfully. Response: {response.json()}")
+                return response.json()["data"][0]["uuid"]
+            else:
+                self.logger.error(
+                    f"Failed to find uuid. Status code: {response.status_code}\nMessage: {response.json()['data']}")
+                return "NULL"
+        except requests.exceptions.RequestException as e:
+            self.logger.error(f"Exception occurred in Mcsm Find Uuid: {e}")
+            return "NULL"
 
     def update_permission(self, uuid: str, permission=int):
         """
