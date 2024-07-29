@@ -134,7 +134,7 @@ class AccountVerification:
         verification_id = str(uuid.uuid4())
         with DBConnection() as cursor:
             cursor.execute(
-                "INSERT INTO account_verifications (email, verification_id) VALUES (?, ?, ?)",
+                "INSERT INTO account_verifications (email, verification_id) VALUES (?, ?)",
                 (email, verification_id)
             )
         return verification_id

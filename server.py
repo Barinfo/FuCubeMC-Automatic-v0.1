@@ -128,7 +128,7 @@ def register_user():
         uuid = mcsm.create_user(email, password, 1)
         if uuid[0] == True:
             cursor.execute(
-                'INSERT INTO users (email, password, uuid) VALUES (?, ?)', (email, hashed_password, uuid))
+                'INSERT INTO users (email, password, uuid) VALUES (?, ?, ?)', (email, hashed_password, uuid))
             logger.info(f"用户 {email} 执行注册成功")
             vid = Ver.apply_verification_id(email)
             msg = Message('【FuCube】注册激活',
