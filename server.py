@@ -45,34 +45,8 @@ with DBConnection() as cursor:
 app = Flask(__name__, static_folder='templates')
 
 
-@app.route('/<path:filename>')
-def serve_static(filename):
-    if '.' in filename and filename.rsplit('.', 1)[-1].lower() != 'html':
-        try:
-            return send_from_directory(app.static_folder, filename)
-        except FileNotFoundError:
-            abort(404)
-
-    html_filename = f'{filename}.html'
-    try:
-        return send_from_directory(app.static_folder, html_filename)
-    except FileNotFoundError:
-        abort(404)
-
-
-@app.route('/')
-def home():
-    return send_from_directory(app.static_folder, 'index.html')
-
-
-if __name__ == '__main__':
-    with open(os.path.join(os.path.dirname(__file__), 'config.json'), 'r') as file:
-        config = json.load(file)
-    app.run(host='0.0.0.0', port=config['port'], threaded=True)
-
-
 @app.route('/active', methods=['GET'])
-def _():
+def active_account():
     vid = request.args.get('id')
     if Ver.verify_id(vid):
         mcsm.update_permission(cursor.execute(
@@ -278,6 +252,26 @@ def check_in():
                 return jsonify({'error': '用户不存在'}), 404
     else:
         return jsonify({'error': '缺少传参'}), 400
+
+
+@app.route('/static/<path:filename>')
+def serve_static(filename):
+    if '.' in filename and filename.rsplit('.', 1)[-1].lower() != 'html':
+        try:
+            return send_from_directory(app.static_folder, filename)
+        except FileNotFoundError:
+            abort(404)
+
+    html_filename = f'{filename}.html'
+    try:
+        return send_from_directory(app.static_folder, html_filename)
+    except FileNotFoundError:
+        abort(404)
+
+
+@app.route('/')
+def home():
+    return send_from_directory(app.static_folder, 'index.html')
 
 
 if __name__ == '__main__':
