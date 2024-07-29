@@ -10,9 +10,11 @@ An automatic controller for MCSManager
 
 - 基于``Python+HTML+SQLite``通过浏览器实现了(~~或将来会实现~~)以下几点功能：
 - [ ] 对接MCSManager api
+- [ ] 对接smtp邮件接口
 - [x] 用户注册登录
 - [x] 签到随机领积分
 - [ ] 积分兑换不同规格的面板服
+- [ ] 一键开服对应版本基础包（预制菜）
 -  ......
 ### 感谢这几个老~~βyd~~开发者
 
