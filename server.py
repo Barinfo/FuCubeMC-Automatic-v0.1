@@ -59,8 +59,8 @@ app = Flask(__name__, static_folder='templates')
 def active_account():
     vid = request.args.to_dict().get('id')
     if Ver.verify_id(vid):
-        mcsm.update_permission(cursor.execute(
-            'SELECT uuid FROM users WHERE email=?', (Ver.get_email(vid),)).fetchone()[0], 1)
+        #mcsm.update_permission(cursor.execute(
+        #    'SELECT uuid FROM users WHERE email=?', (Ver.get_email(vid),)).fetchone()[0], 1)
         return '''
     <!DOCTYPE html>
 <html lang="en">
@@ -106,7 +106,7 @@ def register_user():
     with DBConnection() as cursor:
         if cursor.execute('SELECT email FROM users WHERE email=?', (email,)).fetchone():
             return jsonify({'error': '邮箱已被注册'}), 400
-        uuid = mcsm.create_user(email, password, -1)
+        uuid = mcsm.create_user(email, password, 1)
         if uuid:
             cursor.execute(
                 'INSERT INTO users (email, password, uuid) VALUES (?, ?)', (email, hashed_password, uuid))
