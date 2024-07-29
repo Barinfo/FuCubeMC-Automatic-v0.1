@@ -45,7 +45,8 @@ with DBConnection() as cursor:
             email TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL,
             ban TEXT DEFAULT 'false',
-            points INTEGER DEFAULT 0,
+            points INTEGER DEFAULT 10,
+            sign_count INTEGER DEFAULT 0,
             last_sign TIMESTAMP,
             token TEXT
         );
@@ -249,24 +250,37 @@ def check_in():
     data = request.args.to_dict()
     email = data.get('email')
     token = data.get('token')
+    
     if email and token:
         with DBConnection() as cursor:
             user = cursor.execute(
                 'SELECT last_sign, points, token, ban FROM users WHERE email=?', (email,)).fetchone()
+            
             if user:
                 if not Ver.is_verified(email):
                     return jsonify({'error': '账号未激活'}), 401
+                
                 db_token, points, ban = user[2], user[1], user[3]
+                
                 if db_token != token:
                     return jsonify({'error': '身份验证失败'}), 401
 
                 if ban == 'true':
                     return jsonify({'error': '你已被封禁'}), 403
 
+                # 检查是否是初次签到
+                if user[0] is None or user[0] == '':
+                    new_points = points + 15
+                    cursor.execute('UPDATE users SET last_sign=?, points=? WHERE email=?',
+                                   (datetime.now(), new_points, email))
+                    logger.info(f"用户 {email} 执行初次签到操作，获取积分 15")
+                    return jsonify({'message': '初次签到成功', 'points': new_points, 'add': 15}), 200
+
                 today = datetime.now().date()
                 if user[0] and datetime.strptime(user[0], '%Y-%m-%d %H:%M:%S').date() == today:
                     return jsonify({'error': '你已经签到过了！'}), 400
 
+                # 非初次签到的逻辑
                 first = int(config['sign_point']['min'])
                 last = int(config['sign_point']['max'])
                 pp = random.randint(first, last)
