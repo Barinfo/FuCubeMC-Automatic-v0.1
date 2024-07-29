@@ -47,7 +47,7 @@ app = Flask(__name__, static_folder='templates')
 
 @app.route('/active', methods=['GET'])
 def active_account():
-    vid = request.args.get('id')
+    vid = request.args.to_dict().get('id')
     if Ver.verify_id(vid):
         mcsm.update_permission(cursor.execute(
             'SELECT uuid FROM users WHERE email=?', (Ver.get_email(vid),)).fetchone()[0], 1)
@@ -78,7 +78,7 @@ def active_account():
 
 @app.route('/api/reg', methods=['POST'])
 def register_user():
-    data = request.form
+    data = request.args.to_dict()
     password = data.get('password')
     email = data.get('email')
 
@@ -188,14 +188,14 @@ margin: 0;
 </table>
             '''
             mail.send(msg)
-            return jsonify({'message': '注册成功，请前往邮箱验证'}), 201
+            return jsonify({'message': '注册成功，请前往邮箱验证'}), 200
         else:
             return jsonify({'error': uuid}), 500
 
 
 @app.route('/api/login', methods=['POST'])
 def login_user():
-    data = request.json
+    data = request.args.to_dict()
     email = data.get('email')
     password = data.get('password')
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
@@ -219,7 +219,7 @@ def login_user():
 
 @app.route('/api/sign', methods=['POST'])
 def check_in():
-    data = request.json
+    data = request.args.to_dict()
     email = data.get('email')
     token = data.get('token')
     if email and token:
@@ -247,7 +247,7 @@ def check_in():
                 cursor.execute('UPDATE users SET last_sign=?, points=? WHERE email=?',
                                (datetime.now(), points + pp, email))
                 logger.info(f"用户 {email} 执行签到操作，获取积分 {pp}")
-                return jsonify({'message': '签到成功', 'points': points + pp}), 200
+                return jsonify({'message': '签到成功', 'points': points + pp, 'add': pp}), 200
             else:
                 return jsonify({'error': '用户不存在'}), 404
     else:
