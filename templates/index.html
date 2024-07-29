@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta lang="zh-cn">
     <title>FuCube公益面板 - 开服之路的好搭档</title>
+    <link rel="stylesheet" href="css/fonts.css"> <!-- 引入全局字体 -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -20,20 +21,44 @@
 
         .overlay {
             position: absolute;
-            top: 32%; /* 距离顶部 50% */
-            left: 8%; /* 距离左侧 10% */
+            top: 32%; /* 距离顶部 32% */
+            left: 8%; /* 距离左侧 8% */
             transform: translateY(-50%); /* 垂直居中对齐 */
-            background: rgba(0, 0, 0, 0); /* 半透明黑色背景 */
+            background: rgba(0, 0, 0, 0); /* 透明背景 */
             padding: 20px; /* 内边距 */
             border-radius: 10px; /* 圆角边框 */
             color: white;
-            text-align: center;
+            text-align: left; /* 左对齐 */
             z-index: 1;
         }
 
         .overlay h1 {
-            font-size: 5.2em; /* 字体大小 */
+            font-size: 5.2em; /* 标语字体大小 */
             margin: 0;
+        }
+
+        .overlay p {
+            font-size: 2em; /* 小字字体大小 */
+            margin: 10px 0 20px; /* 上边距 10px，下边距 20px */
+        }
+
+        .overlay .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 1.3em; /* 按钮字体大小，修改此处以调整按钮大小 */
+            color: #ffffff; /* 按钮字体颜色 */
+            border: 2px solid #ffffff; /* 按钮边框颜色 */
+            background: transparent; /* 按钮背景颜色透明 */
+            border-radius: 5px; /* 圆角边框 */
+            text-decoration: none;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s; /* 添加过渡效果 */
+        }
+
+        .overlay .btn:hover {
+            background-color: #ffffff; /* 按钮悬停时背景颜色 */
+            color: rgb(0, 0, 0); /* 按钮悬停时字体颜色 */
         }
 
         .nav-main {
@@ -112,6 +137,8 @@
 <body>
     <div class="overlay">
         <h1>FuCube公益面板</h1>
+        <p>高速 稳定 公益</p> <!-- 小字内容 -->
+        <a href="reg.html" class="btn">现在开始</a> <!-- 透明描边按钮 -->
     </div>
     <div class="nav-main">
         <!-- 导航栏 -->
