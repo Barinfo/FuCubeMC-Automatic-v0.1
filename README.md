@@ -33,8 +33,12 @@ python server.py
 ### 感谢名单
 
 [HRJJACK1145](https://github.com/HRJJACK1145)
+
 [molanp](https://github.com/molanp)
-[bilibilijandy](https://github.com/bilibilijandy)[JMcGee3697](https://github.com/barinfo)
+
+[bilibilijandy](https://github.com/bilibilijandy)
+
+[JMcGee3697](https://github.com/barinfo)
 
 依然云[@JMcGee3697](https://github.com/barinfo)~~这不要脸的~~提供服务器资源支持
 
