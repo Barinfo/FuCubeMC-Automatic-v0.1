@@ -1,11 +1,12 @@
-from flask import Flask, make_response, send_from_directory, abort, request, jsonify
+from flask import Flask, send_from_directory, abort, request, jsonify
 from flask_mail import Mail, Message
 from datetime import datetime
-from until import Logger, AccountVerification, DBConnection, is_email, Mcsm
+from until import Logger, AccountVerification, DBConnection, Mcsm
 from panel import app as panel_app
+from auth import Auth
+from config import config
 import secrets
 import random
-import ujson as json
 import os
 import bcrypt
 
@@ -22,23 +23,10 @@ app.register_blueprint(panel_app, url_prefix='/panel')
 
 mail = Mail(app)
 
-with open(os.path.join(os.path.dirname(__file__), 'config.json'), 'r') as file:
-    config = json.load(file)
-
 logger = Logger()
 Ver = AccountVerification()
+Auth = Auth()
 mcsm = Mcsm(config["mcsm"]["url"], config["mcsm"]["apikey"], logger)
-
-
-def load_salt():
-    if 'salt' not in config:
-        config['salt'] = bcrypt.gensalt().decode()
-
-        with open(os.path.join(os.path.dirname(__file__), 'config.json'), 'w') as file:
-            json.dump(config, file, indent=4)
-
-    return config['salt'].encode('utf-8')
-
 
 with DBConnection() as cursor:
     cursor.execute('''
@@ -47,7 +35,7 @@ with DBConnection() as cursor:
             uuid TEXT NOT NULL,
             email TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL,
-            ban TEXT DEFAULT 'false',
+            role TEXT DEFAULT 'default',
             points INTEGER DEFAULT 10,
             sign_count INTEGER DEFAULT 0,
             last_sign TIMESTAMP,
@@ -60,8 +48,9 @@ with DBConnection() as cursor:
 def active_account():
     vid = request.args.to_dict().get('id')
     if Ver.verify_id(vid):
-        mcsm.update_permission(mcsm.get_uuid(Ver.get_email(vid)), 1)
-        logger.info(f"用户 {Ver.get_email(vid)} 执行激活成功")
+        mcsm.update_permission(mcsm.get_uuid_by_name(
+            Auth.get_name_by_email(Ver.get_email(vid))), 1)
+        logger.info(f"邮箱 {Ver.get_email(vid)} 执行激活成功")
         return '''
     <!DOCTYPE html>
 <html lang="en">
@@ -75,7 +64,7 @@ def active_account():
 </body>
 </html>'''
     else:
-        logger.info(f"用户 {Ver.get_email(vid)} 执行激活失败")
+        logger.info(f"邮箱 {Ver.get_email(vid)} 执行激活失败")
         return '''
     <!DOCTYPE html>
 <html lang="en">
@@ -95,11 +84,14 @@ def register_user():
     logger.debug(data)
     password = data.get('password')
     email = data.get('email')
+    username = data.get('username')
     confirm_password = data.get('confirmPassword')
     gRecaptchaResponse = data.get('g-recaptcha-response')
-    if not all([email, password, confirm_password, gRecaptchaResponse]):
+    if not all([email, password, confirm_password, gRecaptchaResponse, username]):
         # 创建一个字典来存储缺失的参数
         missing_params = []
+        if username is None:
+            missing_params.append('username')
         if email is None:
             missing_params.append('email')
         if password is None:
@@ -115,23 +107,26 @@ def register_user():
         # 返回带有详细错误信息的 JSON 响应
         return jsonify({'error': error_message}), 400
 
-    if not is_email(email):
+    if not Auth.is_email(email):
         return jsonify({'error': '邮箱格式错误'}), 400
+
+    if len(username) > 12 or len(username) < 3:
+        return jsonify({'error': '用户名过长或过短'}), 400
 
     if password != confirm_password:
         return jsonify({'error': '两次输入的密码不一样'}), 400
 
-    hashed_password = bcrypt.hashpw(password.encode('utf-8'), load_salt())
+    hashed_password = Auth.get_hash_password(password)
 
     with DBConnection() as cursor:
         if cursor.execute('SELECT email FROM users WHERE email=?', (email,)).fetchone():
             return jsonify({'error': '邮箱已被注册'}), 400
-    uuid = mcsm.create_user(email, password, -1)
+    uuid = mcsm.create_user(username, password, -1)
     if uuid[0] == True:
         with DBConnection() as cursor:
             cursor.execute(
-                'INSERT INTO users (email, password, uuid) VALUES (?, ?, ?)', (email, hashed_password, uuid[1]))
-        logger.info(f"用户 {email} 执行注册成功")
+                'INSERT INTO users (username, email, password, uuid) VALUES (?, ?, ?, ?)', (username, email, hashed_password, uuid[1]))
+        logger.info(f"邮箱 {email} 执行注册成功")
         vid = Ver.apply_verification_id(email)
         msg = Message('【FuCubeMC】注册激活',
                       sender='barinfo@yeah.net', recipients=[email])
@@ -227,24 +222,24 @@ Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; verti
 @app.route('/api/login', methods=['POST'])
 def login_user():
     data = request.args.to_dict()
-    email = data.get('email')
+    username = data.get('username')
     password = data.get('password')
-    hashed_password = bcrypt.hashpw(password.encode('utf-8'), load_salt())
-    if not email or not password:
+    hashed_password = Auth.get_hashed_password(password)
+    if not username or not password:
         return jsonify({'error': '缺少用户名或密码'}), 400
 
     with DBConnection() as cursor:
         user = cursor.execute(
-            'SELECT points FROM users WHERE email=? AND password=?', (email, hashed_password)).fetchone()
+            'SELECT id, points FROM users WHERE password=? AND username=? OR email=?', (hashed_password, username, username)).fetchone()
         if user:
-            if not Ver.is_verified(email):
+            if not Ver.is_verified(user['id']):
                 return jsonify({'error': '账号未激活'}), 401
             token = secrets.token_hex(16)
             cursor.execute(
-                'UPDATE users SET token=? WHERE email=?', (token, email))
-            logger.info(f"用户 {email} 执行登录成功")
-            resp = make_response(
-                jsonify({'message': '登录成功', 'points': user[0], 'token': token}))
+                'UPDATE users SET token=? WHERE id=?', (token, user['id']))
+            logger.info(f"用户ID {user['id']} 执行登录成功")
+            resp = Auth.set_cookies_and_return_body(
+                {'token': token, 'id': user['id']}, {'message': '登录成功', 'points': user['points']})
             return resp, 200
         else:
             return jsonify({'error': '账号或密码错误'}), 401
@@ -253,46 +248,47 @@ def login_user():
 @app.route('/api/sign', methods=['POST'])
 def check_in():
     data = request.args.to_dict()
-    email = data.get('email')
-    token = data.get('token')
+    id = data.get('id')
+    token = Auth.get_token()
 
-    if email and token:
+    if id and token:
         with DBConnection() as cursor:
             user = cursor.execute(
-                'SELECT last_sign, points, token, ban FROM users WHERE email=?', (email,)).fetchone()
+                'SELECT last_sign, sign_count, points, role FROM users WHERE id=?', (id,)).fetchone()
 
             if user:
-                if not Ver.is_verified(email):
+                if not Ver.is_verified(id):
                     return jsonify({'error': '账号未激活'}), 401
 
-                db_token, points, ban = user[2], user[1], user[3]
+                points, role = user['points'], user['role']
 
-                if db_token != token:
-                    return jsonify({'error': '身份验证失败'}), 401
-
-                if ban == 'true':
+                if role == 'ban':
                     return jsonify({'error': '你已被封禁'}), 403
 
-                # 检查是否是初次签到
-                if user[0] is None or user[0] == '':
-                    new_points = points + 15
-                    cursor.execute('UPDATE users SET last_sign=?, points=? WHERE email=?',
-                                   (datetime.now(), new_points, email))
-                    logger.info(f"用户 {email} 执行初次签到操作，获取积分 15")
-                    return jsonify({'message': '初次签到成功', 'points': new_points, 'add': 15}), 200
+                if Auth.is_token_valid(token, id):
+                    return jsonify({'error': '身份验证失败'}), 401
 
                 today = datetime.now().date()
-                if user[0] and datetime.strptime(user[0], '%Y-%m-%d %H:%M:%S').date() == today:
+                if datetime.strptime(user['last_sign'], '%Y-%m-%d %H:%M:%S').date() == today:
                     return jsonify({'error': '你已经签到过了！'}), 400
+
+                count = user['sign_count'] + 1
+                # 检查是否是初次签到
+                if user['sign_count'] == 0:
+                    new_points = points + 15
+                    cursor.execute('UPDATE users SET last_sign=?, points=?, sign_count=? WHERE id=?',
+                                   (datetime.now(), new_points, count, id))
+                    logger.info(f"用户ID {id} 执行初次签到操作，获取积分 15")
+                    return jsonify({'message': '初次签到成功', 'points': new_points, 'add': 15}), 200
 
                 # 非初次签到的逻辑
                 first = int(config['sign_point']['min'])
                 last = int(config['sign_point']['max'])
                 pp = random.randint(first, last)
 
-                cursor.execute('UPDATE users SET last_sign=?, points=? WHERE email=?',
-                               (datetime.now(), points + pp, email))
-                logger.info(f"用户 {email} 执行签到操作，获取积分 {pp}")
+                cursor.execute('UPDATE users SET last_sign=?, points=?, sign_count=? WHERE id=?',
+                               (datetime.now(), points + pp, count, id))
+                logger.info(f"用户ID {id} 执行签到操作，获取积分 {pp}")
                 return jsonify({'message': '签到成功', 'points': points + pp, 'add': pp}), 200
             else:
                 return jsonify({'error': '用户不存在'}), 404

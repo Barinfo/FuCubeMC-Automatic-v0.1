@@ -7,21 +7,7 @@ import threading
 import os
 import uuid
 import sqlite3
-import re
 import requests
-
-
-def is_email(email: str) -> bool:
-    e = r'^[\w.-]+@(' \
-        r'qq\.com|' \
-        r'126\.com|' \
-        r'163\.com|' \
-        r'yeah\.net|' \
-        r'outlook\.com|' \
-        r'139\.com|' \
-        r'189\.com' \
-        r')$'
-    return bool(re.match(e, str(email)))
 
 
 class DBConnection:
@@ -158,17 +144,17 @@ class AccountVerification:
 
     def is_verified(self, identifier: Union[str, int]) -> bool:
         """
-        检查给定的邮箱是否已验证。
+        检查给定的id是否已验证。
 
         参数:
-            identifier (Union[str, int]): 邮箱。
+            identifier (Union[str, int]): id
 
         返回:
             bool: 如果已验证则返回True，否则False。
         """
         with DBConnection() as cursor:
             cursor.execute(
-                "SELECT verified FROM account_verifications WHERE email = ?",
+                "SELECT verified FROM account_verifications WHERE id = ?",
                 (identifier,)
             )
             result = cursor.fetchone()
@@ -191,6 +177,24 @@ class AccountVerification:
             )
             result = cursor.fetchone()
         return result['email']
+
+    def get_id(self, vid: Union[str, int]) -> str:
+        """
+        获取给定的vid的id
+
+        参数:
+            vid (Union[str, int]): 验证id
+
+        返回:
+            int: id
+        """
+        with DBConnection() as cursor:
+            cursor.execute(
+                "SELECT id FROM account_verifications WHERE verification_id = ?",
+                (vid,)
+            )
+            result = cursor.fetchone()
+        return result['id']
 
 
 class Mcsm:
@@ -226,8 +230,9 @@ class Mcsm:
         try:
             response = requests.post(api_url, data=data, headers=headers)
             if response.status_code == 200:
-                self.logger.debug(f"User created successfully. Response: {response.json()}")
-                return [True, self.get_uuid(username)]
+                self.logger.debug(
+                    f"User created successfully. Response: {response.json()}")
+                return [True, self.get_uuid_by_name(username)]
             else:
                 self.logger.error(
                     f"Failed to create user. Status code: {response.status_code}\nMessage: {response.json()['data']}")
@@ -235,8 +240,8 @@ class Mcsm:
         except requests.exceptions.RequestException as e:
             self.logger.error(f"Exception occurred in Mcsm Create User: {e}")
             return [False, e]
-    
-    def get_uuid(self, username: str)->str:
+
+    def get_uuid_by_name(self, username: str) -> str:
         """
         根据username获取uuid
         """
@@ -247,10 +252,11 @@ class Mcsm:
         try:
             response = requests.get(api_url, headers=headers)
             if response.status_code == 200:
-                self.logger.debug(f"User found uuid successfully. Response: {response.json()}")
+                self.logger.debug(
+                    f"User found uuid successfully. Response: {response.json()}")
                 return response.json()["data"]["data"][0]["uuid"]
             else:
-                self.logger.error(
+                self.logger.warn(
                     f"Failed to find uuid. Status code: {response.status_code}\nMessage: {response.json()['data']}")
                 return "NULL"
         except requests.exceptions.RequestException as e:
@@ -277,13 +283,13 @@ class Mcsm:
                 'permission': permission
             }
         }
-        response = requests.put(api_url, data=data, headers={
+        response = requests.put(api_url, json=data, headers={
             'X-Requested-With': 'XMLHttpRequest'
         })
         redata = json.loads(response.text)
         return redata["data"]
-    
-    def addExample(self,name,type='minecraft/java'):
+
+    def addExample(self, name, type='minecraft/java'):
         """
         创建实例并返回是否成功的布尔值。
 
@@ -297,10 +303,10 @@ class Mcsm:
         str: 实例的UUID
         """
         api_url = f"{self.url}/api/instance?apikey={self.apikey}"
-        if type=='minecraft/java':
-            startCommand='java -jar server.jar'
-        elif type=='minecraft/bedrock':
-            startCommand='bedrock_server.exe'
+        if type == 'minecraft/java':
+            startCommand = 'java -jar server.jar'
+        elif type == 'minecraft/bedrock':
+            startCommand = 'bedrock_server.exe'
         data = {
             'cwd': 'D://server/'+name,
             'ie': 'utf-8',
@@ -315,5 +321,5 @@ class Mcsm:
             'X-Requested-With': 'XMLHttpRequest'
         })
         print(response.text)
-        if response.json()["status"]==200:
+        if response.json()["status"] == 200:
             return response.json()["data"]["instanceUuid"]
