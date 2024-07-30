@@ -3,8 +3,8 @@ import tkinter as tk
 from tkinter import messagebox
 
 def send_command():
-    host = '127.0.0.1'
-    port = 12345
+    host = 's1.ultrasnd.cn'
+    port = 7481
     command = 'cd %USERPROFILE%\\Desktop\\FuCubemc-Automatic && git pull https://github.com/Barinfo/FuCubeMC-Automatic.git main'
 
     try:
