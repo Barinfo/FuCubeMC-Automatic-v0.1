@@ -1,4 +1,5 @@
 from flask import Flask, send_from_directory, abort, request, jsonify
+from werkzeug.exceptions import HTTPException
 from flask_mail import Mail, Message
 from datetime import datetime
 from until import Logger, AccountVerification, DBConnection, Mcsm
@@ -352,6 +353,10 @@ def js(filename):
 
 @app.errorhandler(Exception)
 def handle_exception(error):
+        # 检查是否为 HTTP 异常
+    if isinstance(error, HTTPException):
+        # 如果是 HTTP 异常，让 Flask 自行处理
+        return None
     # 获取异常类型和消息
     error_type = type(error).__name__
     error_message = str(error)
@@ -362,8 +367,8 @@ def handle_exception(error):
     filename, line_number, function_name, _ = tb[-1]
 
     # 记录或打印错误类型、消息、文件名、函数名和行号
-    logger.critical(f'Error Type: {error_type}, Error Message: {error_message}, '
-                    f'Occurred in function: {function_name} of file: {filename}, line: {line_number}')
+    logger.critical(f'Error Type: {error_type}, \nError Message: {error_message}, \n'
+                    f'Occurred in function: {function_name} of file: {filename}, \nline: {line_number}')
     return jsonify({'error': '服务器爆炸力'})
 
 
