@@ -3,7 +3,7 @@
         "min": 2,
         "max": 7
     },
-    "port": 80,
+    "port": 8007,
     "hostname": "yun.wh1t3zz.top",
     "mcsm": {
         "apikey": "04a1d0c4518e46b7a07622fd32433853",
