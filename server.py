@@ -18,7 +18,7 @@ app.config['MAIL_USERNAME'] = 'barinfo@yeah.net'
 app.config['MAIL_PASSWORD'] = 'TQCSAJGFEWKOPJGM'
 app.config['SECRET_KEY'] = '?'
 
-app.register_blueprint(panel_app, url_prefix='/apnel')
+app.register_blueprint(panel_app, url_prefix='/panel')
 
 mail = Mail(app)
 
@@ -312,10 +312,6 @@ def reg():
 @app.route('/login')
 def login():
     return send_from_directory(app.static_folder, 'login.html')
-
-@app.route('/panel')
-def panel():
-    return send_from_directory(app.static_folder, 'panel.html')
 
 
 
