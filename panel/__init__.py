@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request
 from config import config
-from panel import auth
+import auth
 
 app = Blueprint('panel', __name__)
 
