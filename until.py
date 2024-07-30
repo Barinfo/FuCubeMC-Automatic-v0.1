@@ -289,7 +289,7 @@ class Mcsm:
         redata = json.loads(response.text)
         return redata["data"]
 
-    def addExample(self, name, type='minecraft/java'):
+    def addExample(self, name, image, workingDir, ports, type='minecraft/java'):
         """
         创建实例并返回是否成功的布尔值。
 
@@ -311,7 +311,7 @@ class Mcsm:
         '''
         data = {
             "nickname": name,
-            "startCommand": run.bat,
+            "startCommand": "run.bat",
             "stopCommand": "stop",
             "cwd": ".",
             "ie": "utf-8",
@@ -325,13 +325,13 @@ class Mcsm:
             "endTime": "",
             "docker": {
                 "containerName": "",
-                "image": "",
-                "ports": [],
+                "image": image,
+                "ports": ports,
                 "extraVolumes": [],
                 "networkMode": "bridge",
                 "networkAliases": [],
                 "cpusetCpus": "",
-                "workingDir": "/workspace/",
+                "workingDir": workingDir,
                 "env": []
             }
         }
