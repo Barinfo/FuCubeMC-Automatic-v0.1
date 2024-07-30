@@ -285,7 +285,7 @@ class Mcsm:
     
     def addExample(self,name,type='minecraft/java'):
         """
-        创建用户并返回是否成功的布尔值。
+        创建实例并返回是否成功的布尔值。
 
         参数:
         url: API的基础URL

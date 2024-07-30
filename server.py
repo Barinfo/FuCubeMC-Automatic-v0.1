@@ -60,6 +60,7 @@ with DBConnection() as cursor:
 def active_account():
     vid = request.args.to_dict().get('id')
     if Ver.verify_id(vid):
+        mcsm.update_permission(mcsm.get_uuid(Ver.get_email(vid)), 1)
         logger.info(f"用户 {Ver.get_email(vid)} 执行激活成功")
         return '''
     <!DOCTYPE html>
@@ -127,7 +128,7 @@ def register_user():
     with DBConnection() as cursor:
         if cursor.execute('SELECT email FROM users WHERE email=?', (email,)).fetchone():
             return jsonify({'error': '邮箱已被注册'}), 400
-    uuid = mcsm.create_user(email, password, 1)
+    uuid = mcsm.create_user(email, password, -1)
     if uuid[0] == True:
         with DBConnection() as cursor:
             cursor.execute(
