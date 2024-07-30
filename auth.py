@@ -43,8 +43,12 @@ class Auth:
             cursor.execute(
                 "SELECT username FROM users WHERE email = ?", (email,)
             )
-            row = cursor.fetchone()
-        return row.get('username')
+            result = cursor.fetchone()
+        if result is not None:
+            return result['username']
+        else:
+            return None
+
 
     @staticmethod
     def get_name_by_id(id: int) -> str:
@@ -61,8 +65,12 @@ class Auth:
             cursor.execute(
                 "SELECT username FROM users WHERE id = ?", (id,)
             )
-            row = cursor.fetchone()
-        return row.get('username')
+            result = cursor.fetchone()
+        if result is not None:
+            return result['username']
+        else:
+            return None
+
 
     @staticmethod
     def get_info(id: int) -> dict:
