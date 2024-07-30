@@ -247,9 +247,10 @@ def login_user():
     data = request.args.to_dict()
     username = data.get('username')
     password = data.get('password')
-    hashed_password = Auth.get_hash_password(password)
     if not username or not password:
         return jsonify({'error': '缺少用户名或密码'}), 400
+    
+    hashed_password = Auth.get_hash_password(password)
 
     with DBConnection() as cursor:
         user = cursor.execute(

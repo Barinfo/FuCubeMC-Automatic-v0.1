@@ -51,11 +51,15 @@
 					<div class="form-group">
 						<input type="password" class="form-control" id="confirm-password" placeholder="确认密码" required>
 					</div>
-					<script src="https://www.recaptcha.net/recaptcha/api.js" async defer></script>
-					<!-- <div class="form-group">
-						<input type="text" class="form-control" id="captcha" placeholder="通行码" required>
-					</div> -->
-					<div class="g-recaptcha" data-callback="robotVerified" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></div>
+					<div class="form-group">
+						<input type="password" class="form-control" id="password" placeholder="密码" required>
+					</div>
+					<!--<script src="https://www.recaptcha.net/recaptcha/api.js" async defer></script>-->
+					<div class="form-group">
+						<input type="text" class="form-control" id="g-recaptcha-response" placeholder="通行码" required>
+						<img src="" onclick="window.location.href = 'https://player.bilibili.com/player.html?isOutside=true&bvid=BV1z34y1C7Kc&muted=1'" id="captcha" alt="看不清?换一个">
+					</div> 
+					<!--<div class="g-recaptcha" data-callback="robotVerified" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></div>-->
 					<!-- 这段可以跑一下试试 还没试过 ↑  参考文档 https://www.jianshu.com/p/a0c049795014 -->
 					<div class="form-check">
 						<label class="already-have-account"><a href="/login">已有账号? 登录</a></label>
@@ -85,7 +89,7 @@ $(document).ready(function() {
 		var email = $('#email').val();
         var confirmPassword = $('#confirm-password').val();
         // Assuming the reCAPTCHA token is stored in a global variable called 'token'
-        var token = grecaptcha.getResponse();
+        var token = $('#g-recaptcha-response').val();//grecaptcha.getResponse();
 
         // Check if any of the fields are empty or if passwords do not match
         if (!username || !password || !confirmPassword || !token || !email || password !== confirmPassword) {
