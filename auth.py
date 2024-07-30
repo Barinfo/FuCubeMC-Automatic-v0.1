@@ -173,6 +173,7 @@ class Auth:
         设置 cookie 并返回响应体。
 
         参数:
+        - resp (object): Flask 响应对象。
         - cookie_dict (dict): 包含要设置为 cookie 的键值对的字典。
 
         返回:
