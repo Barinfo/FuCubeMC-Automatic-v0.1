@@ -5,7 +5,7 @@ from tkinter import messagebox
 def send_command():
     host = 's1.ultrasnd.cn'
     port = 7481
-    command = 'cd %USERPROFILE%\\Desktop\\FuCubemc-Automatic && git pull https://github.com/Barinfo/FuCubeMC-Automatic.git main'
+    command = 'C:\Users\Administrator\Desktop\pull.bat'
 
     try:
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
