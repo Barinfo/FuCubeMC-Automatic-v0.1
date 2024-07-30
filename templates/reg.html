@@ -40,7 +40,10 @@
 				<!-- Registration form -->
 				<form id="registration-form">
 					<div class="form-group">
-						<input type="username" class="form-control" id="username" placeholder="电子邮箱" required>
+						<input type="username" class="form-control" id="username" placeholder="昵称" required>
+					</div>
+					<div class="form-group">
+						<input type="username" class="form-control" id="email" placeholder="电子邮箱" required>
 					</div>
 					<div class="form-group">
 						<input type="password" class="form-control" id="password" placeholder="密码" required>
@@ -79,12 +82,13 @@ $(document).ready(function() {
         // Get values from the input fields
         var username = $('#username').val();
         var password = $('#password').val();
+		var email = $('#email').val();
         var confirmPassword = $('#confirm-password').val();
         // Assuming the reCAPTCHA token is stored in a global variable called 'token'
         var token = grecaptcha.getResponse();
 
         // Check if any of the fields are empty or if passwords do not match
-        if (!username || !password || !confirmPassword || !token || password !== confirmPassword) {
+        if (!username || !password || !confirmPassword || !token || !email || password !== confirmPassword) {
             swal("Error", "请填写所有字段！", "error");
             return;
         }
@@ -93,6 +97,7 @@ $(document).ready(function() {
         var data = {
             username: username,
             password: password,
+			email: email,
 			confirmPassword: confirmPassword,
             'g-recaptcha-response': token
         };

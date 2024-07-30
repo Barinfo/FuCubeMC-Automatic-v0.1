@@ -230,8 +230,8 @@ class Mcsm:
         try:
             response = requests.post(api_url, data=data, headers=headers)
             if response.status_code == 200:
-                self.logger.debug(
-                    f"User created successfully. Response: {response.json()}")
+                #self.logger.debug(
+                #    f"User created successfully. Response: {response.json()}")
                 return [True, self.get_uuid_by_name(username)]
             else:
                 self.logger.error(
@@ -252,8 +252,8 @@ class Mcsm:
         try:
             response = requests.get(api_url, headers=headers)
             if response.status_code == 200:
-                self.logger.debug(
-                    f"User found uuid successfully. Response: {response.json()}")
+                #self.logger.debug(
+                #    f"User found uuid successfully. Response: {response.json()}")
                 return response.json()["data"]["data"][0]["uuid"]
             else:
                 self.logger.warn(

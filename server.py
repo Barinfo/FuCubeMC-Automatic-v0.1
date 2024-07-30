@@ -33,16 +33,33 @@ with DBConnection() as cursor:
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             uuid TEXT NOT NULL,
+            username TEXT NOT NULL UNIQUE,
             email TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL,
             role TEXT DEFAULT 'default',
             points INTEGER DEFAULT 10,
             sign_count INTEGER DEFAULT 0,
+            logtime TIMESTAMP,
+            regtime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             last_sign TIMESTAMP,
             token TEXT
         );
     ''')
 
+@app.errorhandler(401)
+def err_401(e):
+    return '''
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HTTP 401</title>
+</head>
+<body>
+    <h1 style="color:#ff0000;">未登录或登录失效，3秒后跳转到登录页面。</h1>
+    <script>window.onload(function(){setInterval(function(){window.location.href="https://yun.wh1t3zz.top/login";},3000);});</script>
+</body>
+</html>'''
 
 @app.route('/active', methods=['GET'])
 def active_account():
@@ -81,7 +98,7 @@ def active_account():
 @app.route('/api/reg', methods=['POST'])
 def register_user():
     data = request.values.to_dict(flat=True)
-    logger.debug(data)
+    #logger.debug(data)
     password = data.get('password')
     email = data.get('email')
     username = data.get('username')
@@ -236,7 +253,7 @@ def login_user():
                 return jsonify({'error': '账号未激活'}), 401
             token = secrets.token_hex(16)
             cursor.execute(
-                'UPDATE users SET token=? WHERE id=?', (token, user['id']))
+                'UPDATE users SET token=?, logtime=? WHERE id=?', (token, datetime.now(), user['id']))
             logger.info(f"用户ID {user['id']} 执行登录成功")
             resp = Auth.set_cookies_and_return_body(
                 {'token': token, 'id': user['id']}, {'message': '登录成功', 'points': user['points']})

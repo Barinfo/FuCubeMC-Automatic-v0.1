@@ -79,7 +79,6 @@ class Auth:
         - points  用户积分
         - sign_count   用户签到次数
         - last_sign    用户上次签到时间
-        - token   用户登录令牌
 
         参数:
         - id (int): 用户ID。
@@ -89,7 +88,8 @@ class Auth:
         """
         with DBConnection() as cursor:
             cursor.execute(
-                "SELECT * FROM users WHERE id = ?", (id,)
+                "SELECT id, uuid, email, password, role, points, sign_count, last_sign FROM users WHERE id = ?", (
+                    id,)
             )
             row = cursor.fetchone()
         return row

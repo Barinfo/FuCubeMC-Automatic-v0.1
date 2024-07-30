@@ -4,7 +4,8 @@
     <meta charset="utf-8">
     <meta lang="zh-cn">
     <title>FuCubeMC - 面板</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='panel/style.css') }}">
+    <link rel="stylesheet" href="/css/panel.css">
+    <script src="/js/sweetalert.min.js"></script>
 </head>
 <body>
     <div class="nav-main">
@@ -15,10 +16,41 @@
     </div>
     <div class="content-main">
         <h2>签到</h2>
-        <button onclick="window.location.href='/api/sign'">点我签到</button>
+        <button onclick="sign()'">点我签到</button>
     </div>
     <footer>
         {% include 'panel/footer.html' %}
     </footer>
+    <script>
+    function sign() {
+        fetch('/api/sign', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                'id': '{{ id }}'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            const message = data.message || data.error || JSON.stringify(data);
+            Swal.fire({
+                title: '签到结果',
+                text: message,
+                icon: data.error ? 'error' : 'success',
+                confirmButtonText: 'OK'
+            });
+        })
+        .catch(error => {
+            Swal.fire({
+                title: 'Error!',
+                text: `Fetch Error: ${error}`,
+                icon: 'error',
+                confirmButtonText: 'Try Again'
+            });
+        });
+    }
+    </script>
 </body>
 </html>
