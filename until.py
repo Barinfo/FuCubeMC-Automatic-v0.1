@@ -303,13 +303,15 @@ class Mcsm:
         str: 实例的UUID
         """
         api_url = f"{self.url}/api/instance?apikey={self.apikey}"
+        '''
         if type == 'minecraft/java':
             startCommand = 'java -jar server.jar'
         elif type == 'minecraft/bedrock':
             startCommand = 'bedrock_server.exe'
+        '''
         data = {
             "nickname": name,
-            "startCommand": startCommand,
+            "startCommand": run.bat,
             "stopCommand": "stop",
             "cwd": ".",
             "ie": "utf-8",
