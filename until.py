@@ -308,10 +308,12 @@ class Mcsm:
             'oe': 'utf-8',
             'startCommand': startCommand,
             'stopCommand': 'stop',
-            'type': type
+            'type': type,
+            'role': '',
         }
-        response = requests.put(api_url, data=data, headers={
+        response = requests.post(api_url, data=data, headers={
             'X-Requested-With': 'XMLHttpRequest'
         })
+        print(response.text)
         if response.json()["status"]==200:
             return response.json()["data"]["instanceUuid"]
