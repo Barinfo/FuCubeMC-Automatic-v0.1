@@ -84,6 +84,7 @@ class Auth:
 
         - id  用户唯一id
         - uuid    用户唯一MCSM uuid
+        - username   用户名
         - email   用户邮箱
         - password    用户密码(密文)
         - role    用户角色
@@ -99,7 +100,7 @@ class Auth:
         """
         with DBConnection() as cursor:
             cursor.execute(
-                "SELECT id, uuid, email, password, role, points, sign_count, last_sign FROM users WHERE id = ?", (
+                "SELECT id, uuid, username, email, password, role, points, sign_count, last_sign FROM users WHERE id = ?", (
                     id,)
             )
             row = cursor.fetchone()
