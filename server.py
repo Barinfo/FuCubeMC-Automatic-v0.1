@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory, abort, request, jsonify
+from flask import Flask, make_response, send_from_directory, abort, request, jsonify
 from flask_mail import Mail, Message
 from datetime import datetime
 from until import Logger, AccountVerification, DBConnection, is_email, Mcsm
@@ -131,7 +131,7 @@ def register_user():
                 'INSERT INTO users (email, password, uuid) VALUES (?, ?, ?)', (email, hashed_password, uuid[1]))
         logger.info(f"用户 {email} 执行注册成功")
         vid = Ver.apply_verification_id(email)
-        msg = Message('【FuCube】注册激活',
+        msg = Message('【FuCubeMC】注册激活',
                         sender='barinfo@yeah.net', recipients=[email])
         msg.html = f'''
 <table class="main" width="100%" cellpadding="0" cellspacing="0" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; border-radius: 3px; background-color: #fff; margin: 0; border: 1px 
@@ -241,7 +241,8 @@ def login_user():
             cursor.execute(
                 'UPDATE users SET token=? WHERE email=?', (token, email))
             logger.info(f"用户 {email} 执行登录成功")
-            return jsonify({'message': '登录成功', 'points': user[0], 'token': token}), 200
+            resp = make_response(jsonify({'message': '登录成功', 'points': user[0], 'token': token}))
+            return resp, 200
         else:
             return jsonify({'error': '账号或密码错误'}), 401
 
