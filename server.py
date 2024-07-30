@@ -83,7 +83,7 @@ def active_account():
 @app.route('/api/reg', methods=['POST'])
 def register_user():
     data = request.values.to_dict(flat=True)
-    logger.debug(data)
+    #logger.debug(data)
     password = data.get('password')
     email = data.get('email')
     username = data.get('username')
