@@ -80,7 +80,7 @@ $(document).ready(function() {
         // var token = grecaptcha.getResponse();
 
         // Check if any of the fields are empty or if passwords do not match
-        if (!username || !password || !confirmPassword) {
+        if (!username || !password) {
             swal("Error", "请填写所有字段！", "error");
             return;
         }
