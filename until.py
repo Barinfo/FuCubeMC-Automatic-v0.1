@@ -295,7 +295,7 @@ class Mcsm:
         redata = json.loads(response.text)
         return redata["data"]
 
-    def addExample(self, name, image, workingDir, ports, cpusetCpus, createDatetime, lastDatetime, type):
+    def addExample(self, name, type):
         """
         创建实例并返回是否成功的布尔值。
 
@@ -303,43 +303,54 @@ class Mcsm:
         url: API的基础URL
         apikey: API密钥
         name: 实例名
-        type: 实例类型(使用minecraft/?)默认为mcjava版
+        type: 实例类型(使用minecraft/?)
 
         返回:
         str: 实例的UUID
         """
-        api_url = f"{self.url}/api/instance?apikey={self.apikey}"
-        '''
-        if type == 'minecraft/java':
-            startCommand = 'java -jar server.jar'
-        elif type == 'minecraft/bedrock':
-            startCommand = 'bedrock_server.exe'
-        '''
-        data = {
-            "nickname": name,
-            "startCommand": "run.bat",
-            "stopCommand": "stop",
-            "cwd": ".",
-            "ie": "utf-8",
-            "oe": "utf-8",
-            "processType": "general",
-            "createDatetime": createDatetime,
-            "lastDatetime": lastDatetime,
-            "type": type,
+        api_url = f"{self.url}/api/instance?demonid=bf812a47a8e24e738cd36c617727a2b6&apikey={self.apikey}"
+        InstanceConfig = {
+            "nickname": "New Name",
+            "startCommand": "cmd.exe",
+            "stopCommand":  "^C",
+            "cwd": "/workspaces/my_server/",
+            "ie": "gbk",                        
+            "oe": "gbk",                        
+            "createDatetime": "2022/2/3",
+            "lastDatetime": "2022/2/3 16:02",
+            "type": "universal",                
             "tag": [],
-            "maxSpace": '',
-            "endTime": "",
-            "docker": {
-                "containerName": "",
-                "image": image,
-                "ports": ports,
-                "extraVolumes": [],
-                "networkMode": "bridge",
-                "networkAliases": [],
-                "cpusetCpus": cpusetCpus,
-                "workingDir": workingDir,
-                "env": []
-            }
+            "endTime": "2022/2/28",
+            "fileCode": "gbk",
+            "processType": "",
+            "updateCommand": "shutdown -s",
+            "actionCommandList": [],
+            "crlf": 2,
+            "docker": '',
+}
+        data = {
+            "config": InstanceConfig,
+            "info": {
+                "currentPlayers": -1,
+                "fileLock": 0,
+                "maxPlayers": -1,
+                "openFrpStatus": False,
+                "playersChart": [],
+                "version": "",
+            },
+            "instanceUuid": "50c73059001b436fa85c0d8221c157cf",
+            "processInfo": {
+                "cpu": 0,
+                "memory": 0,
+                "ppid": 0,
+                "pid": 0,
+                "ctime": 0,
+                "elapsed": 0,
+                "timestamp": 0
+            },
+            "space": 0,
+            "started": 6,
+            "status": 3,
         }
         response = requests.post(api_url, data=data, headers={
             'X-Requested-With': 'XMLHttpRequest'
