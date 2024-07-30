@@ -253,7 +253,7 @@ def login_user():
 
     with DBConnection() as cursor:
         user = cursor.execute(
-            'SELECT id, points FROM users WHERE password=? AND username=? OR email=?', (hashed_password, username, username)).fetchone()
+            'SELECT id FROM users WHERE password=? AND username=? OR email=?', (hashed_password, username, username)).fetchone()
         if user:
             if not Ver.is_verified(user['id']):
                 return jsonify({'error': '账号未激活'}), 401
@@ -262,7 +262,7 @@ def login_user():
                 'UPDATE users SET token=?, logtime=? WHERE id=?', (token, datetime.now(), user['id']))
             logger.info(f"用户ID {user['id']} 执行登录成功")
             resp = Auth.set_cookies_and_return_body(
-                {'token': token, 'id': user['id']}, {'message': '登录成功', 'points': user['points']})
+                {'token': token, 'id': user['id']}, {'message': '登录成功'})
             return resp, 200
         else:
             return jsonify({'error': '账号或密码错误'}), 401
