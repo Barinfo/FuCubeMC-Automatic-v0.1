@@ -238,7 +238,7 @@ def login_user():
                 return jsonify({'error': '账号未激活'}), 401
             token = secrets.token_hex(16)
             cursor.execute(
-                'UPDATE users SET token=?, logtime=? WHERE id=?', (token, datetime.now(),user['id']))
+                'UPDATE users SET token=?, logtime=? WHERE id=?', (token, datetime.now(), user['id']))
             logger.info(f"用户ID {user['id']} 执行登录成功")
             resp = Auth.set_cookies_and_return_body(
                 {'token': token, 'id': user['id']}, {'message': '登录成功', 'points': user['points']})
