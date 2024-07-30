@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, abort
 from config import config
-import auth
+from auth import Auth
 
 app = Blueprint('panel', __name__)
 auth = Auth()
@@ -8,7 +8,7 @@ auth = Auth()
 @app.route('/')
 def index():
     if Auth.is_token_valid(Auth.get_token(), request.cookies.get('id')):
-        user_info = auth.get_info(request.cookies.get("id"))
+        user_info = Auth.get_info(request.cookies.get("id"))
         return render_template("panel/index.html", user_info=user_info)
     abort(401)
 
