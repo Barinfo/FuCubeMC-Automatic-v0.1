@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, abort
 from config import config
-from auth import Auth
+import auth
 
 app = Blueprint('panel', __name__)
 auth = Auth()
