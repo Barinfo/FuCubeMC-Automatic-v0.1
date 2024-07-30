@@ -10,7 +10,7 @@ def index():
         "username": "admin",
         "email": "admin@example.com",
         "avatar": "https://",
-        "qiandao_time": "2021-01-01 00:00:00"
+        "role": "admin"
     }
     return render_template("panel/index.html", user_info=user_info)
 
