@@ -158,7 +158,7 @@ class AccountVerification:
                 (identifier,)
             )
             result = cursor.fetchone()
-        return result and result.get('verified') == 1
+        return result and result['verified'] == 1
 
     def get_email(self, vid: Union[str, int]) -> str:
         """

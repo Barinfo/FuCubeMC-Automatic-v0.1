@@ -26,7 +26,10 @@ class Auth:
                 (email,)
             )
             result = cursor.fetchone()
-        return result.get('id')
+        if result is not None:
+            return result['id']
+        else:
+            return None
 
     @staticmethod
     def get_name_by_email(email: str) -> str:
