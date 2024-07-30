@@ -284,6 +284,18 @@ class Mcsm:
         return redata["data"]
     
     def addExample(self,name,type='minecraft/java'):
+        """
+        创建用户并返回是否成功的布尔值。
+
+        参数:
+        url: API的基础URL
+        apikey: API密钥
+        name: 实例名
+        type: 实例类型(使用minecraft/?)默认为mcjava版
+
+        返回:
+        str: 实例的UUID
+        """
         api_url = f"{self.url}/api/instance?apikey={self.apikey}"
         if type=='minecraft/java':
             startCommand='java -jar server.jar'
