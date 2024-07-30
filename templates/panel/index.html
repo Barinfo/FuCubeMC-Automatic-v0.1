@@ -69,12 +69,19 @@
 <body>
     <div class="nav-main">
         <!-- 导航栏 -->
-        <a href="#">我的</a>
+        <a href="#">主页</a>
         <a href="qiandao/">签到</a>
         <a href="instance/">实例</a>
     </div>
     <div class="content-main">
+        <h2>用户信息</h2>
+        <img src='{{ user_info["avatar"] }}' alt="头像"><br>
+        ID：{{ user_info["id"] }}<br>
+        用户名：{{ user_info["username"] }}<br>
+        邮箱：{{ user_info["email"] }}<br>
         前往实例页面查看面板地址。
+        <h2>网站公告</h2>
+        欢迎使用FuCubeMC！当前正在内测，请勿泄露！
     </div>
     <footer>
         <!-- 底部的一堆乱七八糟歪比巴卜 -->
