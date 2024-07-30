@@ -308,14 +308,30 @@ class Mcsm:
         elif type == 'minecraft/bedrock':
             startCommand = 'bedrock_server.exe'
         data = {
-            'cwd': 'D://server/'+name,
-            'ie': 'utf-8',
-            'nackname': name,
-            'oe': 'utf-8',
-            'startCommand': startCommand,
-            'stopCommand': 'stop',
-            'type': type,
-            'role': '',
+            "nickname": name,
+            "startCommand": startCommand,
+            "stopCommand": "stop",
+            "cwd": ".",
+            "ie": "utf-8",
+            "oe": "utf-8",
+            "processType": "general",
+            "createDatetime": "",
+            "lastDatetime": "",
+            "type": type,
+            "tag": [],
+            "maxSpace": '',
+            "endTime": "",
+            "docker": {
+                "containerName": "",
+                "image": "",
+                "ports": [],
+                "extraVolumes": [],
+                "networkMode": "bridge",
+                "networkAliases": [],
+                "cpusetCpus": "",
+                "workingDir": "/workspace/",
+                "env": []
+            }
         }
         response = requests.post(api_url, data=data, headers={
             'X-Requested-With': 'XMLHttpRequest'
