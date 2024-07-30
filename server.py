@@ -2,6 +2,7 @@ from flask import Flask, make_response, send_from_directory, abort, request, jso
 from flask_mail import Mail, Message
 from datetime import datetime
 from until import Logger, AccountVerification, DBConnection, is_email, Mcsm
+from panel import app as panel_app
 import secrets
 import random
 import ujson as json
@@ -16,6 +17,8 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'barinfo@yeah.net'
 app.config['MAIL_PASSWORD'] = 'TQCSAJGFEWKOPJGM'
 app.config['SECRET_KEY'] = '?'
+
+app.register_blueprint(panel_app, url_prefix='/apnel')
 
 mail = Mail(app)
 
