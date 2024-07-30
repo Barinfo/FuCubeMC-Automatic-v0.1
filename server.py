@@ -39,7 +39,8 @@ with DBConnection() as cursor:
             role TEXT DEFAULT 'default',
             points INTEGER DEFAULT 10,
             sign_count INTEGER DEFAULT 0,
-            logtime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            logtime TIMESTAMP,
+            regtime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             last_sign TIMESTAMP,
             token TEXT
         );
