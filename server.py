@@ -245,7 +245,7 @@ Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; verti
 
 @app.route('/api/login', methods=['POST'])
 def login_user():
-    data = request.args.to_dict()
+    data = request.values.to_dict(flat=True)
     username = data.get('username')
     password = data.get('password')
     if not username or not password:
@@ -272,7 +272,7 @@ def login_user():
 
 @app.route('/api/sign', methods=['POST'])
 def check_in():
-    data = request.args.to_dict()
+    data = request.values.to_dict(flat=True)
     id = data.get('id')
     token = Auth.get_token()
 
