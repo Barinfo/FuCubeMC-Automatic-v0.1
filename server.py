@@ -1,4 +1,4 @@
-from flask import Flask, make_response, send_from_directory, abort, request, jsonify
+from flask import Flask, make_response, send_from_directory, abort, request, jsonify, redirect
 from werkzeug.exceptions import HTTPException
 from flask_mail import Mail, Message
 from datetime import datetime
@@ -333,7 +333,10 @@ def reg():
 
 @app.route('/login')
 def login():
-    return send_from_directory(app.static_folder, 'login.html')
+    if Auth.is_token_valid(Auth.get_token(), request.cookies.get('id')):
+        return send_from_directory(app.static_folder, 'login.html')
+    else:
+        return redirect("/panel")
 
 
 @app.route('/favicon.ico')
