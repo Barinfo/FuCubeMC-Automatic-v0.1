@@ -282,3 +282,22 @@ class Mcsm:
         })
         redata = json.loads(response.text)
         return redata["data"]
+    
+    def addExample(self,name,type='minecraft/java'):
+        api_url = f"{self.url}/api/instance?apikey={self.apikey}"
+        if type=='minecraft/java':
+            startCommand='java -jar server.jar'
+        data = {
+            'cwd': 'D://server/'+name,
+            'ie': 'utf-8',
+            'nackname': name,
+            'oe': 'utf-8',
+            'startCommand': startCommand,
+            'stopCommand': 'stop',
+            'type': type
+        }
+        response = requests.put(api_url, data=data, headers={
+            'X-Requested-With': 'XMLHttpRequest'
+        })
+        if response.json()["status"]==200:
+            return response.json()["data"]["instanceUuid"]
