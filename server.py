@@ -98,7 +98,7 @@ def register_user():
     confirm_password = data.get('confirmPassword')
     gRecaptchaResponse = data.get('g-recaptcha-response')
     if not all([email, password, confirm_password, gRecaptchaResponse]):
-                # 创建一个字典来存储缺失的参数
+        # 创建一个字典来存储缺失的参数
         missing_params = []
         if email is None:
             missing_params.append('email')
@@ -111,19 +111,17 @@ def register_user():
 
         # 构造错误消息
         error_message = '缺少以下参数: ' + ', '.join(missing_params)
-        
+
         # 返回带有详细错误信息的 JSON 响应
         return jsonify({'error': error_message}), 400
 
-
     if not is_email(email):
         return jsonify({'error': '邮箱格式错误'}), 400
-    
+
     if password != confirm_password:
         return jsonify({'error': '两次输入的密码不一样'}), 400
 
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), load_salt())
-
 
     with DBConnection() as cursor:
         if cursor.execute('SELECT email FROM users WHERE email=?', (email,)).fetchone():
@@ -136,7 +134,7 @@ def register_user():
         logger.info(f"用户 {email} 执行注册成功")
         vid = Ver.apply_verification_id(email)
         msg = Message('【FuCubeMC】注册激活',
-                        sender='barinfo@yeah.net', recipients=[email])
+                      sender='barinfo@yeah.net', recipients=[email])
         msg.html = f'''
 <table class="main" width="100%" cellpadding="0" cellspacing="0" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; border-radius: 3px; background-color: #fff; margin: 0; border: 1px 
 solid #e9e9e9;
@@ -245,7 +243,8 @@ def login_user():
             cursor.execute(
                 'UPDATE users SET token=? WHERE email=?', (token, email))
             logger.info(f"用户 {email} 执行登录成功")
-            resp = make_response(jsonify({'message': '登录成功', 'points': user[0], 'token': token}))
+            resp = make_response(
+                jsonify({'message': '登录成功', 'points': user[0], 'token': token}))
             return resp, 200
         else:
             return jsonify({'error': '账号或密码错误'}), 401
@@ -256,18 +255,18 @@ def check_in():
     data = request.args.to_dict()
     email = data.get('email')
     token = data.get('token')
-    
+
     if email and token:
         with DBConnection() as cursor:
             user = cursor.execute(
                 'SELECT last_sign, points, token, ban FROM users WHERE email=?', (email,)).fetchone()
-            
+
             if user:
                 if not Ver.is_verified(email):
                     return jsonify({'error': '账号未激活'}), 401
-                
+
                 db_token, points, ban = user[2], user[1], user[3]
-                
+
                 if db_token != token:
                     return jsonify({'error': '身份验证失败'}), 401
 
@@ -305,14 +304,20 @@ def check_in():
 def home():
     return send_from_directory(app.static_folder, 'index.html')
 
+
 @app.route('/reg')
 def reg():
     return send_from_directory(app.static_folder, 'reg.html')
+
 
 @app.route('/login')
 def login():
     return send_from_directory(app.static_folder, 'login.html')
 
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(app.static_folder, 'favicon.ico')
 
 
 @app.route('/css/<path:filename>')
@@ -321,7 +326,8 @@ def css(filename):
         return send_from_directory(os.path.join(app.static_folder, "css"), filename)
     except FileNotFoundError:
         abort(404)
-        
+
+
 @app.route('/js/<path:filename>')
 def js(filename):
     try:
