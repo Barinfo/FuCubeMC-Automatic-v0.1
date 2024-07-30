@@ -263,6 +263,8 @@ def login_user():
             logger.info(f"用户ID {user['id']} 执行登录成功")
             resp = Auth.set_cookies_and_return_body(
                 {'token': token, 'id': user['id']}, {'message': '登录成功'})
+            resp.set_cookie('token', token)
+            resp.set_cookie('id', str(user['id']))
             return resp, 200
         else:
             return jsonify({'error': '账号或密码错误'}), 401
