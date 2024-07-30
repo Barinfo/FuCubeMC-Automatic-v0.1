@@ -289,7 +289,7 @@ class Mcsm:
         redata = json.loads(response.text)
         return redata["data"]
 
-    def addExample(self, name, image, workingDir, ports, type='minecraft/java'):
+    def addExample(self, name, image, workingDir, ports, cpusetCpus, createDatetime,lastDatetime, type):
         """
         创建实例并返回是否成功的布尔值。
 
@@ -317,8 +317,8 @@ class Mcsm:
             "ie": "utf-8",
             "oe": "utf-8",
             "processType": "general",
-            "createDatetime": "",
-            "lastDatetime": "",
+            "createDatetime": createDatetime,
+            "lastDatetime": lastDatetime,
             "type": type,
             "tag": [],
             "maxSpace": '',
@@ -330,7 +330,7 @@ class Mcsm:
                 "extraVolumes": [],
                 "networkMode": "bridge",
                 "networkAliases": [],
-                "cpusetCpus": "",
+                "cpusetCpus": cpusetCpus,
                 "workingDir": workingDir,
                 "env": []
             }
