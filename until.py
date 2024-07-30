@@ -299,6 +299,8 @@ class Mcsm:
         api_url = f"{self.url}/api/instance?apikey={self.apikey}"
         if type=='minecraft/java':
             startCommand='java -jar server.jar'
+        elif type=='minecraft/bedrock':
+            startCommand='bedrock_server.exe'
         data = {
             'cwd': 'D://server/'+name,
             'ie': 'utf-8',
