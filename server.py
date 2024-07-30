@@ -261,7 +261,7 @@ def login_user():
                 return jsonify({'error': '账号未激活'}), 401
             token = secrets.token_hex(16)
             cursor.execute(
-                'UPDATE users SET token=?, logtime=? WHERE id=?', (token, datetime.now(), user['id']))
+                'UPDATE users SET token=?, logtime=? WHERE id=?', (token, datetime.now().strftime('%Y-%m-%d %H:%M:%S'), user['id']))
             logger.info(f"用户ID {user['id']} 执行登录成功")
             resp = make_response(jsonify({'message': '登录成功'}))
             resp = Auth.set_cookies(resp, {'token': token, 'id': user['id']})
@@ -302,7 +302,7 @@ def check_in():
                 if user['sign_count'] == 0:
                     new_points = points + 15
                     cursor.execute('UPDATE users SET last_sign=?, points=?, sign_count=? WHERE id=?',
-                                   (datetime.now(), new_points, count, id))
+                                   (datetime.now().strftime('%Y-%m-%d %H:%M:%S'), new_points, count, id))
                     logger.info(f"用户ID {id} 执行初次签到操作，获取积分 15")
                     return jsonify({'message': '初次签到成功', 'points': new_points, 'add': 15}), 200
 
@@ -312,7 +312,7 @@ def check_in():
                 pp = random.randint(first, last)
 
                 cursor.execute('UPDATE users SET last_sign=?, points=?, sign_count=? WHERE id=?',
-                               (datetime.now(), points + pp, count, id))
+                               (datetime.now().strftime('%Y-%m-%d %H:%M:%S'), points + pp, count, id))
                 logger.info(f"用户ID {id} 执行签到操作，获取积分 {pp}")
                 return jsonify({'message': '签到成功', 'points': points + pp, 'add': pp}), 200
             else:

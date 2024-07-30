@@ -147,16 +147,16 @@ class Auth:
         """
         with DBConnection() as cursor:
             cursor.execute(
-                "SELECT logtime, username FROM users WHERE token = ? AND id = ?",
+                "SELECT logtime FROM users WHERE token = ? AND id = ?",
                 (token, id)
             )
             row = cursor.fetchone()
             if not row:
                 return False
-            logtime = datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S')
+            logtime = datetime.strptime(row['logtime'], '%Y-%m-%d %H:%M:%S')
             current_time = datetime.now()
             time_diff = (current_time - logtime).total_seconds()
-            if time_diff < 60 * 30:  # 有效期30分钟
+            if time_diff < 60 * 30:
                 return True
             else:
                 return False
