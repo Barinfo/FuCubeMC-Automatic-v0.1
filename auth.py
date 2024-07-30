@@ -193,4 +193,8 @@ class Auth:
         返回:
         - bytes: 密码的哈希值。
         """
-        return bcrypt.hashpw(password.encode('utf-8'), self.load_salt())
+        if password is not None and isinstance(password, str):
+            encoded_password = password.encode('utf-8')
+            return bcrypt.hashpw(encoded_password, self.load_salt())
+        else:
+            raise ValueError("Password must be a non-empty string")
