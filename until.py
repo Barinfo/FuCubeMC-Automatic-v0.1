@@ -176,7 +176,7 @@ class AccountVerification:
                 (vid,)
             )
             result = cursor.fetchone()
-        return result['email']
+        return result[0]
 
     def get_id(self, vid: Union[str, int]) -> str:
         """
