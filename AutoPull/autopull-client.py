@@ -25,9 +25,10 @@ def send_command():
 # 创建主窗口
 root = tk.Tk()
 root.title("同步工具")
+root.geometry("250x100")
 
 # 创建一个按钮
-sync_button = tk.Button(root, text="同步", command=send_command)
+sync_button = tk.Button(root, text="同步", command=send_command ,width=20, height=2)
 sync_button.pack(pady=20)
 
 # 运行主循环
