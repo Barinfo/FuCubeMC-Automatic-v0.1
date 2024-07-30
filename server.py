@@ -262,7 +262,7 @@ def login_user():
                 'UPDATE users SET token=?, logtime=? WHERE id=?', (token, datetime.now(), user['id']))
             logger.info(f"用户ID {user['id']} 执行登录成功")
             resp = make_response(jsonify({'message': '登录成功'}))
-            resp = Auth.set_cookies({'token': token, 'id': user['id']})
+            resp = Auth.set_cookies(resp,{'token': token, 'id': user['id']})
             return resp, 200
         else:
             return jsonify({'error': '账号或密码错误'}), 401
