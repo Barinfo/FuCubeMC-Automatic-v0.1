@@ -191,6 +191,8 @@ class Auth:
         - object: 设置了 cookie 并携带响应体的 Flask 响应对象。
         """
         for key, value in cookie_dict.items():
+            if not isinstance(value, (str, bytes)):
+                value = str(value)
             resp.set_cookie(key, value)
         return resp
 
