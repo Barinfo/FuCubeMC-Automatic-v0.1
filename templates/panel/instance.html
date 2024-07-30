@@ -3,91 +3,21 @@
 <head>
     <meta charset="utf-8">
     <meta lang="zh-cn">
-    <title>FuCube公益面板 - 开服之路的好搭档</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            color: #333;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-        }
-
-        .nav-main {
-            background-color: #007BFF;
-            color: white;
-            padding: 10px 0;
-            text-align: center;
-        }
-        .nav-main a {
-            color: white;
-            text-decoration: none;
-            margin: 0 10px;
-            padding: 5px 10px;
-            border-radius: 5px;
-        }
-        .nav-main a:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .content-main {
-            max-width: 800px;
-            margin: 30px auto;
-            padding: 20px;
-            background-color: white;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .bottom-main {
-            background-color: #333;
-            color: white;
-            padding: 20px 0;
-            text-align: center;
-        }
-        .bottom-link {
-            margin-bottom: 10px;
-        }
-        .bottom-link-span {
-            font-weight: bold;
-        }
-        .bottom-copyrighticp {
-            font-size: 0.9em;
-        }
-        .bottom-copyrighticp-span {
-            display: block;
-        }
-
-        /* 响应式设计 */
-        @media (max-width: 600px) {
-            .nav-main a {
-                display: block;
-                margin: 5px 0;
-            }
-        }
-    </style>
+    <title>FuCubeMC - 面板</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='panel/style.css') }}">
 </head>
 <body>
     <div class="nav-main">
         <!-- 导航栏 -->
-        <a href="../">主页</a>
-        <a href="qiandao/">签到</a>
-        <a href="#">实例</a>
+        <a href="/panel/">主页</a>
+        <a href="/panel/qiandao/">签到</a>
+        <a href="/panel/instance/">实例</a>
     </div>
     <div class="content-main">
         <a href="{{ panel_addr }}">点我前往MCSM（暂时）</a>
     </div>
     <footer>
-        <!-- 底部的一堆乱七八糟歪比巴卜 -->
-        <div class="bottom-main">
-            <div class="bottom-link">
-                <span class="bottom-link-span">
-                    友情链接：
-                </span>
-            </div>
-            <div class="bottom-copyrighticp">
-                <span class="bottom-copyrighticp-span">版权所有 FuCubeCloud 芙方云 2024 保留所有权利。</span>
-            </div>
-        </div>
+        {% include 'panel/footer.html' %}
     </footer>
 </body>
 </html>

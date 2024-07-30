@@ -14,7 +14,11 @@ def index():
     }
     return render_template("panel/index.html", user_info=user_info)
 
-@app.route('/instance')
+@app.route('/instance/')
 def instance():
     panel_addr = config["mcsm"]["url"]
     return render_template("panel/instance.html", panel_addr=panel_addr)
+
+@app.route('/qiandao/')
+def qiandao():
+    return render_template("panel/qiandao.html")
