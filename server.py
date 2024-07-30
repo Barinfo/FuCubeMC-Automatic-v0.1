@@ -1,4 +1,4 @@
-from flask import Flask, send_from_directory, abort, request, jsonify
+from flask import Flask, make_response, send_from_directory, abort, request, jsonify
 from werkzeug.exceptions import HTTPException
 from flask_mail import Mail, Message
 from datetime import datetime
@@ -261,10 +261,8 @@ def login_user():
             cursor.execute(
                 'UPDATE users SET token=?, logtime=? WHERE id=?', (token, datetime.now(), user['id']))
             logger.info(f"用户ID {user['id']} 执行登录成功")
-            resp = Auth.set_cookies_and_return_body(
-                {'token': token, 'id': user['id']}, {'message': '登录成功'})
-            resp.set_cookie('token', token)
-            resp.set_cookie('id', str(user['id']))
+            resp = make_response(jsonify({'message': '登录成功'}))
+            resp = Auth.set_cookies({'token': token, 'id': user['id']})
             return resp, 200
         else:
             return jsonify({'error': '账号或密码错误'}), 401

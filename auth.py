@@ -168,22 +168,19 @@ class Auth:
         return token
 
     @staticmethod
-    def set_cookies_and_return_body(cookie_dict: dict, body) -> object:
+    def set_cookies(resp, cookie_dict: dict) -> object:
         """
         设置 cookie 并返回响应体。
 
         参数:
         - cookie_dict (dict): 包含要设置为 cookie 的键值对的字典。
-        - body (str or dict): 要作为响应体返回的内容。
 
         返回:
         - object: 设置了 cookie 并携带响应体的 Flask 响应对象。
         """
-        response = make_response(
-            jsonify(body) if isinstance(body, dict) else body)
         for key, value in cookie_dict.items():
-            response.set_cookie(key, value)
-        return response
+            resp.set_cookie(key, value)
+        return resp
 
     def get_hash_password(self, password: str) -> bytes:
         """
