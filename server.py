@@ -45,6 +45,20 @@ with DBConnection() as cursor:
         );
     ''')
 
+@app.errorhandler(401)
+def err_401(e):
+    return '''
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HTTP 401</title>
+</head>
+<body>
+    <h1 style="color:#ff0000;">未登录或登录失效，3秒后跳转到登录页面。</h1>
+    <script>window.onload(function(){setInterval(function(){window.location.href="https://yun.wh1t3zz.top/login";},3000);});</script>
+</body>
+</html>'''
 
 @app.route('/active', methods=['GET'])
 def active_account():
