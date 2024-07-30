@@ -6,6 +6,7 @@ from panel import app as panel_app
 from auth import Auth
 from config import config
 import secrets
+import traceback
 import random
 import os
 
@@ -351,13 +352,18 @@ def js(filename):
 
 @app.errorhandler(Exception)
 def handle_exception(error):
-    logger.critical('An error occurred during a request', exc_info=True)
+    # 获取异常类型和消息
+    error_type = type(error).__name__
+    error_message = str(error)
     
-    # 如果你不想 Flask 处理这个异常，可以在这里重新抛出
-    # raise
-    
-    # 返回一个错误响应，这取决于你的应用需求
-    # 这里返回一个 500 错误，你可以根据需要自定义响应
+    # 获取当前异常的堆栈跟踪
+    tb = traceback.extract_tb(error.__traceback__)
+    # 获取最后一个堆栈帧的信息，即引发异常的那行代码的位置
+    filename, line_number, function_name, _ = tb[-1]
+
+    # 记录或打印错误类型、消息、文件名、函数名和行号
+    logger.critical(f'Error Type: {error_type}, Error Message: {error_message}, '
+                    f'Occurred in function: {function_name} of file: {filename}, line: {line_number}')
     return jsonify({'error': '服务器爆炸力'})
 
 
