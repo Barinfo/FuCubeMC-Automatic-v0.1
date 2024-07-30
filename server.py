@@ -68,9 +68,10 @@ def err_401(e):
 @app.route('/active', methods=['GET'])
 def active_account():
     vid = request.args.to_dict().get('id')
-    if Ver.verify_id(vid):
+    email = Ver.get_email(vid)
+    if Ver.verify_id(vid) and email is not None:
         mcsm.update_permission(mcsm.get_uuid_by_name(
-            Auth.get_name_by_email(Ver.get_email(vid))), 1)
+            Auth.get_name_by_email(email)), 1)
         logger.info(f"邮箱 {Ver.get_email(vid)} 执行激活成功")
         return '''
     <!DOCTYPE html>

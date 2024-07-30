@@ -176,7 +176,10 @@ class AccountVerification:
                 (vid,)
             )
             result = cursor.fetchone()
-        return result.get('email')
+        if result is not None:
+            return result['email']
+        else:
+            return None
 
     def get_id(self, vid: Union[str, int]) -> str:
         """
@@ -194,7 +197,10 @@ class AccountVerification:
                 (vid,)
             )
             result = cursor.fetchone()
-        return result.get('id')
+        if result is not None:
+            return result['id']
+        else:
+            return None
 
 
 class Mcsm:
@@ -230,7 +236,7 @@ class Mcsm:
         try:
             response = requests.post(api_url, data=data, headers=headers)
             if response.status_code == 200:
-                #self.logger.debug(
+                # self.logger.debug(
                 #    f"User created successfully. Response: {response.json()}")
                 return [True, self.get_uuid_by_name(username)]
             else:
@@ -252,7 +258,7 @@ class Mcsm:
         try:
             response = requests.get(api_url, headers=headers)
             if response.status_code == 200:
-                #self.logger.debug(
+                # self.logger.debug(
                 #    f"User found uuid successfully. Response: {response.json()}")
                 return response.json()["data"]["data"][0]["uuid"]
             else:
@@ -289,7 +295,7 @@ class Mcsm:
         redata = json.loads(response.text)
         return redata["data"]
 
-    def addExample(self, name, image, workingDir, ports, cpusetCpus, createDatetime,lastDatetime, type):
+    def addExample(self, name, image, workingDir, ports, cpusetCpus, createDatetime, lastDatetime, type):
         """
         创建实例并返回是否成功的布尔值。
 
