@@ -328,7 +328,10 @@ def home():
 
 @app.route('/reg')
 def reg():
-    return send_from_directory(app.static_folder, 'reg.html')
+    if Auth.is_token_valid(Auth.get_token(), request.cookies.get('id')):
+        return send_from_directory(app.static_folder, 'reg.html')
+    else:
+        return redirect("/panel")
 
 
 @app.route('/login')
