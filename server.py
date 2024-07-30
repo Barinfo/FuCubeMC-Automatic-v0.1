@@ -349,6 +349,17 @@ def js(filename):
     except FileNotFoundError:
         abort(404)
 
+@app.errorhandler(Exception)
+def handle_exception(error):
+    logger.critical('An error occurred during a request', exc_info=True)
+    
+    # 如果你不想 Flask 处理这个异常，可以在这里重新抛出
+    # raise
+    
+    # 返回一个错误响应，这取决于你的应用需求
+    # 这里返回一个 500 错误，你可以根据需要自定义响应
+    return jsonify({'error': '服务器爆炸力'})
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=config["port"], threaded=True)
