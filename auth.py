@@ -1,21 +1,30 @@
-from functools import wraps
-from flask import request, jsonify
+from datetime import datetime
 from until import DBConnection
 
-def require_auth(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        auth_token = request.cookies.get('auth_token')
-        if not auth_token:
-            return jsonify({'error': '未授权，请先登录'}), 401
-        
-        with DBConnection() as cursor:
-            user = cursor.execute(
-                'SELECT email FROM users WHERE token=?', (auth_token,)).fetchone()
-            if user is None:
-                return jsonify({'error': '无效的token'}), 401
-            request.user = {'email': user[0]}
-        
-        return f(*args, **kwargs)
+def is_token_valid(token):
+    """
+    检查给定的令牌是否有效。
     
-    return decorated_function
+    参数:
+    token (str): 要验证的令牌字符串。
+
+    返回:
+    bool: 如果令牌有效则返回True，否则返回False。
+    """
+    with DBConnection() as cursor:
+        query = """
+            SELECT logtime, username 
+            FROM users 
+            WHERE token = ?
+        """
+        cursor.execute(query, (token,))
+        row = cursor.fetchone()
+        if not row:
+            return False
+        logtime = datetime.strptime(row[0], '%Y-%m-%d %H:%M:%S')
+        current_time = datetime.now()
+        time_diff = (current_time - logtime).total_seconds()
+        if time_diff < 60 * 30 or row[1]:   # 有效期30分钟
+            return True
+        else:
+            return False
