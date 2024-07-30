@@ -176,7 +176,7 @@ class AccountVerification:
                 (vid,)
             )
             result = cursor.fetchone()
-        return result['email']
+        return result[0]
 
     def get_id(self, vid: Union[str, int]) -> str:
         """
@@ -289,7 +289,7 @@ class Mcsm:
         redata = json.loads(response.text)
         return redata["data"]
 
-    def addExample(self, name, type='minecraft/java'):
+    def addExample(self, name, image, workingDir, ports, type='minecraft/java'):
         """
         创建实例并返回是否成功的布尔值。
 
@@ -303,19 +303,37 @@ class Mcsm:
         str: 实例的UUID
         """
         api_url = f"{self.url}/api/instance?apikey={self.apikey}"
+        '''
         if type == 'minecraft/java':
             startCommand = 'java -jar server.jar'
         elif type == 'minecraft/bedrock':
             startCommand = 'bedrock_server.exe'
+        '''
         data = {
-            'cwd': 'D://server/'+name,
-            'ie': 'utf-8',
-            'nackname': name,
-            'oe': 'utf-8',
-            'startCommand': startCommand,
-            'stopCommand': 'stop',
-            'type': type,
-            'role': '',
+            "nickname": name,
+            "startCommand": "run.bat",
+            "stopCommand": "stop",
+            "cwd": ".",
+            "ie": "utf-8",
+            "oe": "utf-8",
+            "processType": "general",
+            "createDatetime": "",
+            "lastDatetime": "",
+            "type": type,
+            "tag": [],
+            "maxSpace": '',
+            "endTime": "",
+            "docker": {
+                "containerName": "",
+                "image": image,
+                "ports": ports,
+                "extraVolumes": [],
+                "networkMode": "bridge",
+                "networkAliases": [],
+                "cpusetCpus": "",
+                "workingDir": workingDir,
+                "env": []
+            }
         }
         response = requests.post(api_url, data=data, headers={
             'X-Requested-With': 'XMLHttpRequest'

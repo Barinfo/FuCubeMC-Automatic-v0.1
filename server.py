@@ -9,6 +9,7 @@ from config import config
 import secrets
 import traceback
 import random
+import sys
 import os
 
 app = Flask(__name__, static_folder='templates')
@@ -47,6 +48,7 @@ with DBConnection() as cursor:
         );
     ''')
 
+
 @app.errorhandler(401)
 def err_401(e):
     return '''
@@ -61,6 +63,7 @@ def err_401(e):
     <script>window.onload(function(){setInterval(function(){window.location.href="https://yun.wh1t3zz.top/login";},3000);});</script>
 </body>
 </html>'''
+
 
 @app.route('/active', methods=['GET'])
 def active_account():
@@ -99,7 +102,7 @@ def active_account():
 @app.route('/api/reg', methods=['POST'])
 def register_user():
     data = request.values.to_dict(flat=True)
-    #logger.debug(data)
+    # logger.debug(data)
     password = data.get('password')
     email = data.get('email')
     username = data.get('username')
@@ -250,7 +253,7 @@ def login_user():
 
     with DBConnection() as cursor:
         user = cursor.execute(
-            'SELECT id, points FROM users WHERE password=? AND username=? OR email=?', (hashed_password, username, username)).fetchone()
+            'SELECT id FROM users WHERE password=? AND username=? OR email=?', (hashed_password, username, username)).fetchone()
         if user:
             if not Ver.is_verified(user['id']):
                 return jsonify({'error': '账号未激活'}), 401
@@ -259,7 +262,7 @@ def login_user():
                 'UPDATE users SET token=?, logtime=? WHERE id=?', (token, datetime.now(), user['id']))
             logger.info(f"用户ID {user['id']} 执行登录成功")
             resp = Auth.set_cookies_and_return_body(
-                {'token': token, 'id': user['id']}, {'message': '登录成功', 'points': user['points']})
+                {'token': token, 'id': user['id']}, {'message': '登录成功'})
             return resp, 200
         else:
             return jsonify({'error': '账号或密码错误'}), 401
@@ -351,24 +354,14 @@ def js(filename):
     except FileNotFoundError:
         abort(404)
 
-@app.errorhandler(Exception)
-def handle_exception(error):
-        # 检查是否为 HTTP 异常
-    if isinstance(error, HTTPException):
-        # 如果是 HTTP 异常，让 Flask 自行处理
-        return None
-    # 获取异常类型和消息
-    error_type = type(error).__name__
-    error_message = str(error)
-    
-    # 获取当前异常的堆栈跟踪
-    tb = traceback.extract_tb(error.__traceback__)
-    # 获取最后一个堆栈帧的信息，即引发异常的那行代码的位置
-    filename, line_number, function_name, _ = tb[-1]
 
-    # 记录或打印错误类型、消息、文件名、函数名和行号
-    logger.critical(f'Error Type: {error_type}, \nError Message: {error_message}, \n'
-                    f'Occurred in function: {function_name} of file: {filename}, \nline: {line_number}')
+@app.errorhandler(500)
+def handle_non_http_exception(e):
+    error_type = type(e).__name__
+    error_message = str(e)
+    error_traceback = traceback.extract_tb(sys.exc_info()[2])[-1]
+    result = f'ERROR:\nType: {error_type}\nMessage: {error_message}\nLine: {error_traceback.lineno}\nFile: {error_traceback.filename}\nFunction: {error_traceback.name}'
+    logger.critical(result)
     return jsonify({'error': '服务器爆炸力'})
 
 
