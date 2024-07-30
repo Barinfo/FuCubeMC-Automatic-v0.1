@@ -99,7 +99,7 @@ $(document).ready(function() {
 			dataType: 'json', // Specify that you expect JSON data back
 			success: function(response, textStatus, xhr) {
 				// Check the HTTP status code from the response object
-				swal("Success", response.message, "success");
+				window.location.href = '/panel';
 			},
 			error: function(xhr, status, error) {
 				// Handle any errors that occur during the request
