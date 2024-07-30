@@ -1,17 +1,12 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request
 from config import config
+import auth
 
 app = Blueprint('panel', __name__)
 
 @app.route('/')
 def index():
-    user_info = {
-        "id": 1,
-        "username": "admin",
-        "email": "admin@example.com",
-        "avatar": "https://",
-        "role": "admin"
-    }
+    user_info = auth.get_info(request.cookies.get("ID"))
     return render_template("panel/index.html", user_info=user_info)
 
 @app.route('/instance/')
