@@ -158,7 +158,7 @@ class AccountVerification:
                 (identifier,)
             )
             result = cursor.fetchone()
-        return result and result['verified'] == 1
+        return result and result.get('verified') == 1
 
     def get_email(self, vid: Union[str, int]) -> str:
         """
@@ -176,7 +176,7 @@ class AccountVerification:
                 (vid,)
             )
             result = cursor.fetchone()
-        return result[0]
+        return result.get('email')
 
     def get_id(self, vid: Union[str, int]) -> str:
         """
@@ -194,7 +194,7 @@ class AccountVerification:
                 (vid,)
             )
             result = cursor.fetchone()
-        return result['id']
+        return result.get('id')
 
 
 class Mcsm:

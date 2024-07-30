@@ -1,6 +1,6 @@
 from datetime import datetime
 from until import DBConnection
-from flask import request, make_response, jsonify
+from flask import request
 from config import config
 import bcrypt
 import ujson as json
@@ -26,7 +26,7 @@ class Auth:
                 (email,)
             )
             result = cursor.fetchone()
-        return result['id']
+        return result.get('id')
 
     @staticmethod
     def get_name_by_email(email: str) -> str:
@@ -44,7 +44,7 @@ class Auth:
                 "SELECT username FROM users WHERE email = ?", (email,)
             )
             row = cursor.fetchone()
-        return row['username']
+        return row.get('username')
 
     @staticmethod
     def get_name_by_id(id: int) -> str:
@@ -62,7 +62,7 @@ class Auth:
                 "SELECT username FROM users WHERE id = ?", (id,)
             )
             row = cursor.fetchone()
-        return row['username']
+        return row.get('username')
 
     @staticmethod
     def get_info(id: int) -> dict:
