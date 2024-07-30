@@ -33,11 +33,13 @@ with DBConnection() as cursor:
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             uuid TEXT NOT NULL,
+            username TEXT NOT NULL UNIQUE,
             email TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL,
             role TEXT DEFAULT 'default',
             points INTEGER DEFAULT 10,
             sign_count INTEGER DEFAULT 0,
+            logtime TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             last_sign TIMESTAMP,
             token TEXT
         );
@@ -236,7 +238,7 @@ def login_user():
                 return jsonify({'error': '账号未激活'}), 401
             token = secrets.token_hex(16)
             cursor.execute(
-                'UPDATE users SET token=? WHERE id=?', (token, user['id']))
+                'UPDATE users SET token=?, logtime=? WHERE id=?', (token, datetime.now(),user['id']))
             logger.info(f"用户ID {user['id']} 执行登录成功")
             resp = Auth.set_cookies_and_return_body(
                 {'token': token, 'id': user['id']}, {'message': '登录成功', 'points': user['points']})
