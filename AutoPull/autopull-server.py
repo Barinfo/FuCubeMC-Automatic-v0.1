@@ -26,6 +26,7 @@ def start_server(host='0.0.0.0', port=12345):
         client_socket.sendall(output.encode())
 
         client_socket.close()
+        print(f"Done.")
 
 if __name__ == "__main__":
     start_server()
