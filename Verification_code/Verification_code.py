@@ -1,5 +1,6 @@
 import random
 import string
+import os
 from PIL import Image, ImageDraw, ImageFont
 
 def generate_random_string(length=5):
@@ -17,7 +18,7 @@ def draw_rotated_text(image, text, font_sizes, image_width, image_height):
     for font_size in sorted(font_sizes, reverse=True):
         char_images.clear()
         for char in text:
-            font = ImageFont.truetype("C:\\Users\\Administrator\\code\\arial.ttf", font_size)
+            font = ImageFont.truetype(os.path.join(os.path.dirname(os.path.abspath(__file__)), "arial.ttf"), font_size)
             angle = random.randint(-30, 30)
 
             text_image = Image.new('RGBA', (100, 100), (255, 255, 255, 0))
