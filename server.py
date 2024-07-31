@@ -372,4 +372,4 @@ def handle_non_http_exception(e):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=config["port"], threaded=True)
+    app.run(host='0.0.0.0', port=config["port"], threaded=True, debug=True)
