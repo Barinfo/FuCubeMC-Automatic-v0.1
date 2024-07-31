@@ -84,6 +84,7 @@ $(document).ready(function() {
         event.preventDefault();
 
         // Get values from the input fields
+		var username = $('#avatar').val();
         var username = $('#username').val();
         var password = $('#password').val();
 		var email = $('#email').val();
@@ -97,8 +98,18 @@ $(document).ready(function() {
             return;
         }
 
+		if (!email.includes('@')) {
+			swal("Error", "邮箱格式不正确！", "error");
+			return;
+		}
+
+		if (!avatar) {
+			avatar = "http://www.gravatar.com/avatar/null";
+		}
+		
         // Prepare the data to send
         var data = {
+			avatar: avatar,
             username: username,
             password: password,
 			email: email,
