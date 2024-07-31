@@ -1,13 +1,30 @@
 {
-    "sign_point": {
-        "min": 2,
-        "max": 7
-    },
-    "port": 8007,
-    "hostname": "yun.wh1t3zz.top",
-    "mcsm": {
-        "apikey": "04a1d0c4518e46b7a07622fd32433853",
-        "url": "http://s1.rancloud.xyz:23333"
-    },
-    "salt": "$2b$12$oNO.Jq8O.iuEPsRP9Rm8Nu"
+  "sign_point": {
+    "min": 2,
+    "max": 7
+  },
+  "port": 8007,
+  "hostname": "yun.wh1t3zz.top",
+  "mcsm": {
+    "apikey": "04a1d0c4518e46b7a07622fd32433853",
+    "url": "http://s1.rancloud.xyz:23333"
+  },
+  "salt": "$2b$12$oNO.Jq8O.iuEPsRP9Rm8Nu",
+  "commodity": [
+    {
+      "cid": 1,
+      "name": "Commodity 1",
+      "level_limit": "default",
+      "prices": [
+        {
+          "cycle": "day",
+          "price": 1
+                },
+        {
+          "cycle": "week",
+          "price": 5
+                }
+            ]
+        }
+    ]
 }
