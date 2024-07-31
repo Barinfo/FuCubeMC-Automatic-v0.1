@@ -3,3 +3,4 @@ ujson
 bcrypt
 requests
 flask_mail
+Pillow
