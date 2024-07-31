@@ -19,7 +19,8 @@ POST /api/reg
 {
     password: string,
     confirmPassword: string, //确认密码
-    email: string
+    email: string,
+    username: string
 }
 ```
 
@@ -54,7 +55,7 @@ POST /api/login
 ```js
 {
     password: string,
-    email: string
+    username: string //用户名或Email
 }
 ```
 
@@ -78,10 +79,10 @@ POST /api/login
 }
 ```
 
-## User Login
+## User Sign
 
 ```http
-POST /api/login
+POST /api/sign
 ```
 
 ### Query Param
@@ -90,8 +91,7 @@ POST /api/login
 
 ```js
 {
-    token: string,
-    email: string
+    id: int,
 }
 ```
 
