@@ -6,7 +6,7 @@ from io import BytesIO
 
 def generate_captcha_with_base64(length=5, image_width=240, image_height=135, font_sizes=[50, 45, 40]):
     def generate_random_string(length):
-        chars = '0123456789abdefghjklmnpqrst!?@#$%&()uwyABDEFGHJKLMNPQRSTUY'
+        chars = '0123456789abdefghjklmnpqrst@#$%&uwyABDEFGHJKLMNPQRSTUY'
         return ''.join(random.choices(chars, k=length))
 
     def draw_rotated_text(image, text, font_sizes, image_width, image_height):
