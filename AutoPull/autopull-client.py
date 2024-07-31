@@ -10,15 +10,15 @@ def send_command(progress_var, button, status_label):
     command = 'C:/Users/Administrator/Desktop/pull.bat'
 
     try:
+
+        status_label.config(text="同步中...")
+        button.config(state=tk.DISABLED)
+        
         client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         client_socket.connect((host, port))
 
         client_socket.sendall(command.encode())
-
-        status_label.config(text="同步中...")
-        button.config(state=tk.DISABLED)
-
-        for i in range(81):
+        for i in range(91):
             root.update_idletasks()
             progress_var.set(i)
             root.update()
@@ -44,6 +44,9 @@ def send_command(progress_var, button, status_label):
 
         messagebox.showinfo("Success", f"已完成同步")
     except Exception as e:
+        button.config(state=tk.NORMAL)
+
+        status_label.config(text="同步失败")
         messagebox.showerror("Error", f"同步失败: {e}")
 
 # 创建主窗口
