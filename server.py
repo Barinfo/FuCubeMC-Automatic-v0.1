@@ -38,7 +38,7 @@ with DBConnection() as cursor:
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             uuid TEXT NOT NULL,
             username TEXT NOT NULL UNIQUE,
-            avatar TEXT,
+            avatar_url TEXT DEFAULT '/favicon.ico',
             email TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL,
             role TEXT DEFAULT 'default',
