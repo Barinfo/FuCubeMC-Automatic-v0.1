@@ -50,11 +50,11 @@
 - **用途**: 从请求中获取令牌。
 - **返回**: 令牌值，如果没有找到则返回`None`。
 
-##### `set_cookies_and_return_body(cookie_dict: dict, body) -> object`
+##### `set_cookies(resp: object, cookie_dict: dict) -> object`
 - **用途**: 设置cookie并返回响应体。
 - **参数**: 
-  - `cookie_dict`: 包含要设置为cookie的键值对的字典。
-  - `body`: 要作为响应体返回的内容。
+  - `resp`: Flask 响应对象。
+  - `cookie_dict`: 包含要设置为 cookie 的键值对的字典。
 - **返回**: 设置了cookie并携带响应体的Flask响应对象。
 
 ##### `get_hash_password(password: str) -> bytes`

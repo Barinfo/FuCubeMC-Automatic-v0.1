@@ -180,7 +180,7 @@ class Auth:
         return token
 
     @staticmethod
-    def set_cookies(resp, cookie_dict: dict) -> object:
+    def set_cookies(resp: object, cookie_dict: dict) -> object:
         """
         设置 cookie 并返回响应体。
 
