@@ -309,6 +309,22 @@ class Mcsm:
         str: 实例的UUID
         """
         api_url = f"{self.url}/api/instance?demonid=bf812a47a8e24e738cd36c617727a2b6&apikey={self.apikey}"
+        DockerConfig = {
+  "containerName": "",
+  "image": "openjdk:21",
+  "memory": 1024, 
+  "ports": ["25565:25565/tcp"],
+  "extraVolumes": [],
+  "maxSpace": None,
+  "network": None,
+  "io": None,
+  "networkMode": "bridge",
+  "networkAliases": [],
+  "cpusetCpus": "",
+  "cpuUsage": 100,
+  "workingDir": "",
+  "env": []
+}
         InstanceConfig = {
             "nickname": "New Name",
             "startCommand": "cmd.exe",
@@ -326,31 +342,10 @@ class Mcsm:
             "updateCommand": "shutdown -s",
             "actionCommandList": [],
             "crlf": 2,
-            "docker": '',
+            "docker": DockerConfig,
         }
         data = {
             "config": InstanceConfig,
-            "info": {
-                "currentPlayers": -1,
-                "fileLock": 0,
-                "maxPlayers": -1,
-                "openFrpStatus": False,
-                "playersChart": [],
-                "version": "",
-            },
-            "instanceUuid": "50c73059001b436fa85c0d8221c157cf",
-            "processInfo": {
-                "cpu": 0,
-                "memory": 0,
-                "ppid": 0,
-                "pid": 0,
-                "ctime": 0,
-                "elapsed": 0,
-                "timestamp": 0
-            },
-            "space": 0,
-            "started": 6,
-            "status": 3,
         }
         response = requests.post(api_url, data=data, headers={
             'X-Requested-With': 'XMLHttpRequest'
