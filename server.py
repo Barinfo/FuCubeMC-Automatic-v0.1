@@ -73,18 +73,7 @@ def active_account():
         mcsm.update_permission(mcsm.get_uuid_by_name(
             Auth.get_name_by_email(email)), 1)
         logger.info(f"邮箱 {Ver.get_email(vid)} 执行激活成功")
-        return '''
-    <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>验证结果</title>
-</head>
-<body>
-    <h1 style="color:#66ccff;">验证成功，3秒后跳转到登录页面。</h1>
-    <script>window.onload()=function(){setInterval(function(){window.location.href="https://yun.wh1t3zz.top/login";},3000);}</script>
-</body>
-</html>'''
+        return redirect("/panel")
     else:
         logger.info(f"邮箱 {Ver.get_email(vid)} 执行激活失败")
         return '''
@@ -250,7 +239,7 @@ def login_user():
     password = data.get('password')
     if not username or not password:
         return jsonify({'error': '缺少用户名或密码'}), 400
-    
+
     hashed_password = Auth.get_hash_password(password)
 
     with DBConnection() as cursor:
@@ -329,17 +318,15 @@ def home():
 @app.route('/reg')
 def reg():
     if Auth.is_token_valid(Auth.get_token(), request.cookies.get('id')):
-        return send_from_directory(app.static_folder, 'reg.html')
-    else:
         return redirect("/panel")
+    return send_from_directory(app.static_folder, 'reg.html')
 
 
 @app.route('/login')
 def login():
     if Auth.is_token_valid(Auth.get_token(), request.cookies.get('id')):
-        return send_from_directory(app.static_folder, 'login.html')
-    else:
         return redirect("/panel")
+    return send_from_directory(app.static_folder, 'login.html')
 
 
 @app.route('/favicon.ico')
@@ -374,4 +361,4 @@ def handle_non_http_exception(e):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=config["port"], threaded=True)
+    app.run(host='0.0.0.0', port=config["port"], threaded=True, debug=True)
