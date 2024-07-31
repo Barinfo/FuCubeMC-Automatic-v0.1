@@ -137,7 +137,7 @@ def register_user():
     if uuid[0] == True:
         with DBConnection() as cursor:
             cursor.execute(
-                'INSERT INTO users (username, avatar, email, password, uuid) VALUES (?, ?, ?, ?, ?)', (username, avatar_url, email, hashed_password, uuid[1]))
+                'INSERT INTO users (username, email, password, uuid) VALUES (?, ?, ?, ?)', (username, email, hashed_password, uuid[1]))
         logger.info(f"邮箱 {email} 执行注册成功")
         vid = Ver.apply_verification_id(email)
         msg = Message('【FuCubeMC】注册激活',
