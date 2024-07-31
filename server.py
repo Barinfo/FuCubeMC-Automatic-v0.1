@@ -1,10 +1,10 @@
-from flask import Flask, make_response, send_from_directory, abort, request, jsonify, redirect
-from werkzeug.exceptions import HTTPException
+from flask import Flask, make_response, send_from_directory, abort, request, jsonify, redirect, render_template
 from flask_mail import Mail, Message
 from datetime import datetime
 from until import Logger, AccountVerification, DBConnection, Mcsm
 from panel import app as panel_app
 from auth import Auth
+from captcha import Captcha
 from config import config
 import secrets
 import traceback
@@ -19,7 +19,8 @@ app.config['MAIL_PORT'] = 25
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'barinfo@yeah.net'
 app.config['MAIL_PASSWORD'] = 'TQCSAJGFEWKOPJGM'
-app.config['SECRET_KEY'] = '?'
+app.config['SECRET_KEY'] = 'MFOq1joZmEur0GR8'
+app.config['SESSION_TYPE'] = 'filesystem'
 
 app.register_blueprint(panel_app, url_prefix='/panel')
 
@@ -29,6 +30,7 @@ logger = Logger()
 Ver = AccountVerification()
 Auth = Auth()
 mcsm = Mcsm(config["mcsm"]["url"], config["mcsm"]["apikey"], logger)
+Capt = Captcha(5)
 
 with DBConnection() as cursor:
     cursor.execute('''
@@ -36,6 +38,7 @@ with DBConnection() as cursor:
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             uuid TEXT NOT NULL,
             username TEXT NOT NULL UNIQUE,
+            avatar TEXT,
             email TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL,
             role TEXT DEFAULT 'default',
@@ -97,9 +100,8 @@ def register_user():
     email = data.get('email')
     username = data.get('username')
     confirm_password = data.get('confirmPassword')
-    gRecaptchaResponse = data.get('g-recaptcha-response')
-    if not all([email, password, confirm_password, gRecaptchaResponse, username]):
-        # 创建一个字典来存储缺失的参数
+    captcha = data.get('captcha')
+    if not all([email, password, confirm_password, captcha, username]):
         missing_params = []
         if username is None:
             missing_params.append('username')
@@ -109,14 +111,13 @@ def register_user():
             missing_params.append('password')
         if confirm_password is None:
             missing_params.append('confirm_password')
-        if gRecaptchaResponse is None:
-            missing_params.append('g-recaptcha-response')
-
-        # 构造错误消息
+        if captcha is None:
+            missing_params.append('captcha')
         error_message = '缺少以下参数: ' + ', '.join(missing_params)
-
-        # 返回带有详细错误信息的 JSON 响应
         return jsonify({'error': error_message}), 400
+    
+    if not Capt.validate_captcha(captcha):
+        return jsonify({'error': "验证码错误"}), 400
 
     if not Auth.is_email(email):
         return jsonify({'error': '邮箱格式错误'}), 400
@@ -136,7 +137,7 @@ def register_user():
     if uuid[0] == True:
         with DBConnection() as cursor:
             cursor.execute(
-                'INSERT INTO users (username, email, password, uuid) VALUES (?, ?, ?, ?)', (username, email, hashed_password, uuid[1]))
+                'INSERT INTO users (username, avatar, email, password, uuid) VALUES (?, ?, ?, ?, ?)', (username, avatar_url, email, hashed_password, uuid[1]))
         logger.info(f"邮箱 {email} 执行注册成功")
         vid = Ver.apply_verification_id(email)
         msg = Message('【FuCubeMC】注册激活',
@@ -319,14 +320,14 @@ def home():
 def reg():
     if Auth.is_token_valid(Auth.get_token(), request.cookies.get('id')):
         return redirect("/panel")
-    return send_from_directory(app.static_folder, 'reg.html')
+    return render_template('reg.html', captcha=Capt.get())
 
 
 @app.route('/login')
 def login():
     if Auth.is_token_valid(Auth.get_token(), request.cookies.get('id')):
         return redirect("/panel")
-    return send_from_directory(app.static_folder, 'login.html')
+    return render_template('login.html', captcha=Capt.get())
 
 
 @app.route('/favicon.ico')
@@ -354,11 +355,11 @@ def js(filename):
 def handle_non_http_exception(e):
     error_type = type(e).__name__
     error_message = str(e)
-    error_traceback = traceback.extract_tb(sys.exc_info()[2])[-1]
+    error_traceback = traceback.extract_tb(sys.exc_info()[2])[-2]
     result = f'ERROR:\nType: {error_type}\nMessage: {error_message}\nLine: {error_traceback.lineno}\nFile: {error_traceback.filename}\nFunction: {error_traceback.name}'
     logger.critical(result)
     return jsonify({'error': '服务器爆炸力'})
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=config["port"], threaded=True, debug=True)
+    app.run(host='0.0.0.0', port=config["port"], threaded=True, debug=False)

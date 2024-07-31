@@ -1,12 +1,11 @@
-import datetime
-import logging
-import datetime
 from typing import Union
+from datetime import datetime
 import ujson as json
 import threading
 import os
 import uuid
 import sqlite3
+import logging
 import requests
 
 
@@ -49,7 +48,7 @@ class Logger:
 
     def _ensure_log_file_created(self):
         """确保日志文件在首次记录日志时创建，或在新的一天开始时创建新文件。"""
-        today = datetime.datetime.now().date()
+        today = datetime.now().date()
         if self.file_handler is None or today != self.current_log_date:
             with self.lock:
                 if self.file_handler is not None and today != self.current_log_date:
@@ -59,7 +58,8 @@ class Logger:
                 self.current_log_date = today
                 self.log_file = os.path.join(
                     self.log_file_prefix, f"{today}.log")
-                self.file_handler = logging.FileHandler(self.log_file)
+                self.file_handler = logging.FileHandler(
+                    self.log_file, encoding='utf-8')
                 self.file_handler.setLevel(logging.DEBUG)
                 self.file_handler.setFormatter(logging.Formatter(
                     '%(asctime)s - %(levelname)s - %(message)s', datefmt='%Y-%m-%d %H:%M:%S'))
@@ -314,11 +314,11 @@ class Mcsm:
             "startCommand": "cmd.exe",
             "stopCommand":  "^C",
             "cwd": "/workspaces/my_server/",
-            "ie": "gbk",                        
-            "oe": "gbk",                        
+            "ie": "gbk",
+            "oe": "gbk",
             "createDatetime": "2022/2/3",
             "lastDatetime": "2022/2/3 16:02",
-            "type": "universal",                
+            "type": "universal",
             "tag": [],
             "endTime": "2022/2/28",
             "fileCode": "gbk",
@@ -327,7 +327,7 @@ class Mcsm:
             "actionCommandList": [],
             "crlf": 2,
             "docker": '',
-}
+        }
         data = {
             "config": InstanceConfig,
             "info": {

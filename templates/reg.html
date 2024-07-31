@@ -37,11 +37,10 @@
 		<div class="col-lg-8">
 			<div class="login">
 				<h2>FuCube注册</h2>
-				<!-- Registration form -->
 				<form id="registration-form">
-					<div class="form-group">
+					<!--<div class="form-group">
 						<input type="avatar" class="form-control" id="avatar" placeholder="头像地址(可选)">
-					</div>
+					</div>-->
 					<div class="form-group">
 						<input type="username" class="form-control" id="username" placeholder="昵称" required>
 					</div>
@@ -54,13 +53,10 @@
 					<div class="form-group">
 						<input type="password" class="form-control" id="confirm-password" placeholder="确认密码" required>
 					</div>
-					<!--<script src="https://www.recaptcha.net/recaptcha/api.js" async defer></script>
 					<div class="form-group">
-						<input type="text" class="form-control" id="g-recaptcha-response" placeholder="通行码" required>
-						<img src="" onclick="window.location.href = 'https://player.bilibili.com/player.html?isOutside=true&bvid=BV1z34y1C7Kc&muted=1'" id="captcha" alt="看不清?换一个">
-					</div> -->
-					<!--<div class="g-recaptcha" data-callback="robotVerified" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></div>-->
-					<!-- 这段可以跑一下试试 还没试过 ↑  参考文档 https://www.jianshu.com/p/a0c049795014 -->
+						<img src="{{ captcha }}" alt="图片验证码" style="height: 60px;">
+						<input type="text" class="form-control" id="captcha" placeholder="验证码" required>
+					</div>
 					<div class="form-check">
 						<label class="already-have-account"><a href="/login">已有账号? 登录</a></label>
 					</div>
@@ -68,86 +64,63 @@
 					<br>
 					<button type="submit" class="btn btn-lg btn-block btn-success" id="submit-btn">注册</button>
 				</form>
-				<!-- End Registration form -->
-
 			</div>
-			<span style="color:white;">Copyright &copy; 2024 FuCubeCloud 芙方云 All rights reserved.</span> 
+			<span style="color:grey;">Copyright &copy; 2024 FuCubeCloud 芙方云 All rights reserved.</span> 
 		</div>
 	</div>
 </div>
 <script>
-// jQuery ready function to ensure the DOM is fully loaded before executing any code
 $(document).ready(function() {
-    // Attach a click event handler to the submit button
     $('#submit-btn').click(function(event) {
-        // Prevent the default form submission behavior
         event.preventDefault();
-
-        // Get values from the input fields
-		var username = $('#avatar').val();
         var username = $('#username').val();
         var password = $('#password').val();
 		var email = $('#email').val();
         var confirmPassword = $('#confirm-password').val();
-        // Assuming the reCAPTCHA token is stored in a global variable called 'token'
-        var token = '114514'//$('#g-recaptcha-response').val();//grecaptcha.getResponse();
+        var captcha = $('#captcha').val();
 
-        // Check if any of the fields are empty or if passwords do not match
-        if (!username || !password || !confirmPassword || !token || !email || password !== confirmPassword) {
-            swal("Error", "请填写所有字段！", "error");
+        if (!username || !password || !confirmPassword || !captcha || !email) {
+            swal("错误", "请填写所有字段！", "error");
             return;
         }
+
+		if (password !== confirmPassword) {
+			swal("错误", "两次输入的密码不一致！", "error");
+			return;
+		}
 
 		if (!email.includes('@')) {
 			swal("Error", "邮箱格式不正确！", "error");
 			return;
 		}
-
-		if (!avatar) {
-			avatar = "http://www.gravatar.com/avatar/null";
-		}
 		
-        // Prepare the data to send
         var data = {
-			avatar: avatar,
             username: username,
             password: password,
 			email: email,
 			confirmPassword: confirmPassword,
-            'g-recaptcha-response': token
+            captcha: captcha
         };
 
-        // Send an AJAX request
 		$.ajax({
-			url: '/api/reg', // Replace this with your actual registration endpoint
+			url: '/api/reg',
 			type: 'POST',
 			data: data,
-			dataType: 'json', // Specify that you expect JSON data back
+			dataType: 'json',
 			success: function(response, textStatus, xhr) {
-				// Check the HTTP status code from the response object
-				swal("Success", response.message, "success");
+				swal("", response.message, "success");
 			},
 			error: function(xhr, status, error) {
-				// Handle any errors that occur during the request
 				var responseText = xhr.responseText;
 				try {
 					var responseJson = JSON.parse(responseText);
 					if (typeof responseJson === 'object' && responseJson !== null) {
-						// 确保解析结果是一个对象
-						if (responseJson.error) {
-							// 如果 JSON 中有 'error' 键，使用它
-							swal("Error", responseJson.error, "error");
-						} else {
-							// 否则，使用一个默认的错误消息
-							swal("Error", "An unexpected error occurred.", "error");
-						}
+						swal("错误", responseJson.error, "error");
 					} else {
-						// 如果响应不是有效的 JSON 对象，显示原始文本
-						swal("Error", "Server response: " + responseText, "error");
+						swal("错误", responseText, "error");
 					}
 				} catch (e) {
-					// 如果解析 JSON 失败，显示原始文本
-					swal("Error", "Server response: " + responseText, "error");
+					swal("错误", responseText, "error");
 				}
 			}
 		});
