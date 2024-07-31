@@ -250,7 +250,7 @@ def login_user():
     password = data.get('password')
     if not username or not password:
         return jsonify({'error': '缺少用户名或密码'}), 400
-    
+
     hashed_password = Auth.get_hash_password(password)
 
     with DBConnection() as cursor:
@@ -329,17 +329,15 @@ def home():
 @app.route('/reg')
 def reg():
     if Auth.is_token_valid(Auth.get_token(), request.cookies.get('id')):
-        return send_from_directory(app.static_folder, 'reg.html')
-    else:
         return redirect("/panel")
+    return send_from_directory(app.static_folder, 'reg.html')
 
 
 @app.route('/login')
 def login():
     if Auth.is_token_valid(Auth.get_token(), request.cookies.get('id')):
-        return send_from_directory(app.static_folder, 'login.html')
-    else:
         return redirect("/panel")
+    return send_from_directory(app.static_folder, 'login.html')
 
 
 @app.route('/favicon.ico')
