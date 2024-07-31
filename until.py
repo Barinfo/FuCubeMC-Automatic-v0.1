@@ -310,21 +310,21 @@ class Mcsm:
         """
         api_url = f"{self.url}/api/instance?demonid=bf812a47a8e24e738cd36c617727a2b6&apikey={self.apikey}"
         DockerConfig = {
-  "containerName": "",
-  "image": "openjdk:21",
-  "memory": 1024, 
-  "ports": ["25565:25565/tcp"],
-  "extraVolumes": [],
-  "maxSpace": None,
-  "network": None,
-  "io": None,
-  "networkMode": "bridge",
-  "networkAliases": [],
-  "cpusetCpus": "",
-  "cpuUsage": 100,
-  "workingDir": "",
-  "env": []
-}
+            "containerName": "",
+            "image": "openjdk:21",
+            "memory": 1024, 
+            "ports": ["25565:25565/tcp"],
+            "extraVolumes": [],
+            "maxSpace": None,
+            "network": None,
+            "io": None,
+            "networkMode": "bridge",
+            "networkAliases": [],
+            "cpusetCpus": "",
+            "cpuUsage": 100,
+            "workingDir": "",
+            "env": []
+        }
         InstanceConfig = {
             "nickname": "New Name",
             "startCommand": "cmd.exe",
