@@ -14,9 +14,7 @@ An automatic controller for MCSManager
 python server.py
 ```
 
-# [`config.json`说明](config.md)
-
-# [API Doc](API.md)
+# [Document](Document/README.md)
 
 ## 已实现的功能
 
@@ -30,18 +28,4 @@ python server.py
 - [ ] 积分兑换不同规格的面板服
 - [ ] 一键开服对应版本基础包（预制菜）
 
-### 感谢名单
-
-[HRJJACK1145](https://github.com/HRJJACK1145)
-
-[molanp](https://github.com/molanp)
-
-[bilibilijandy](https://github.com/bilibilijandy)
-
-[JMcGee3697](https://github.com/barinfo)
-
-[夜影星辰](https://github.com/yeying-xingchen)
-
-and 依然云[@JMcGee3697](https://github.com/barinfo)~~这不要脸的~~提供服务器资源支持
-
-*FuCubeMC 芙方云 2024 All Rights Reserved*
+## [感谢名单](Document/thanks.md)
