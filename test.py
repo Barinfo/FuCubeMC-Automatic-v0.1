@@ -9,7 +9,7 @@ key = "04a1d0c4518e46b7a07622fd32433853"
 
 def addExample(name, type):
     """
-    创建实例并返回是否成功的布尔值。
+    创建实例并返回是否成功的布尔值。·
 
     参数:
     url: API的基础URL
@@ -20,7 +20,7 @@ def addExample(name, type):
     返回:
     str: 实例的UUID
     """
-    api_url = f"{url}/api/instance?demonId=bf812a47a8e24e738cd36c617727a2b6&apikey={key}"
+    api_url = f"{url}/api/instance?daemonId=bf812a47a8e24e738cd36c617727a2b6&apikey={key}"
     DockerConfig = {
         "containerName": "test",
         "image": "openjdk:21",
@@ -77,29 +77,10 @@ def addExample(name, type):
         }
     }
     data = {
-        "config": InstanceConfig,
-            "info": {
-                "currentPlayers": -1,
-                "fileLock": 0,
-                "maxPlayers": -1,
-                "openFrpStatus": 'false',
-                "playersChart": [],
-                "version": "",
-            },
-            "instanceUuid": "50c73059001b436fa85c0d8221c157cf",
-            "processInfo": {
-                "cpu": 0,
-                "memory": 0,
-                "ppid": 0,
-                "pid": 0,
-                "ctime": 0,
-                "elapsed": 0,
-                "timestamp": 0
-            },
-            "space": 0,
-            "started": 6,
-            "status": 3,
-    }
+            "nickname": "New Name",
+            "startCommand": "cmd.exe",
+            "stopCommand":  "^C",
+        }
     print(str(data).replace("'","\""))
     response = requests.post(api_url, data=data, headers={
         'X-Requested-With': 'XMLHttpRequest'

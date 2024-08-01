@@ -295,7 +295,7 @@ class Mcsm:
         redata = json.loads(response.text)
         return redata["data"]
 
-    def addExample(self, name, type):
+    def addExample(self, name, type,processType="general"):
         """
         创建实例并返回是否成功的布尔值。
 
@@ -308,7 +308,7 @@ class Mcsm:
         返回:
         str: 实例的UUID
         """
-        api_url = f"{self.url}/api/instance?demonid=bf812a47a8e24e738cd36c617727a2b6&apikey={self.apikey}"
+        api_url = f"{self.url}/api/instance?daemonId=bf812a47a8e24e738cd36c617727a2b6&apikey={self.apikey}"
         DockerConfig = {
             "containerName": "",
             "image": "openjdk:21",
@@ -325,27 +325,17 @@ class Mcsm:
             "workingDir": "",
             "env": []
         }
-        InstanceConfig = {
-            "nickname": "New Name",
-            "startCommand": "cmd.exe",
-            "stopCommand":  "^C",
-            "cwd": "/workspaces/my_server/",
-            "ie": "gbk",
-            "oe": "gbk",
-            "createDatetime": "2022/2/3",
-            "lastDatetime": "2022/2/3 16:02",
-            "type": "universal",
-            "tag": [],
-            "endTime": "2022/2/28",
-            "fileCode": "gbk",
-            "processType": "",
-            "updateCommand": "shutdown -s",
-            "actionCommandList": [],
-            "crlf": 2,
-            "docker": DockerConfig,
-        }
         data = {
-            "config": InstanceConfig,
+            "nickname": name,
+            "startCommand": "java -Dfile.encoding=utf-8 -Djline.terminal=jline.UnsupportedTerminal -jar server.jar",
+            "stopCommand":  "stop",
+            "type": type,
+            "ie": "utf-8",
+            "oe": "utf-8",
+            "cwd": "D://server/"+name,
+            "docker": DockerConfig,
+            "processType": processType,
+
         }
         response = requests.post(api_url, data=data, headers={
             'X-Requested-With': 'XMLHttpRequest'
