@@ -1,5 +1,5 @@
 from flask import Flask, make_response, send_from_directory, abort, request, jsonify, redirect, render_template
-from flask_mail import Mail, Message
+from mail import Mail
 from datetime import datetime
 from until import Logger, AccountVerification, DBConnection, Mcsm
 from panel import app as panel_app
@@ -22,9 +22,9 @@ app.config['MAIL_PASSWORD'] = 'TQCSAJGFEWKOPJGM'
 app.config['SECRET_KEY'] = 'MFOq1joZmEur0GR8'
 app.config['SESSION_TYPE'] = 'filesystem'
 
-app.register_blueprint(panel_app, url_prefix='/panel')
-
 mail = Mail(app)
+
+app.register_blueprint(panel_app, url_prefix='/panel')
 
 logger = Logger()
 Ver = AccountVerification()
@@ -140,11 +140,10 @@ def register_user():
                 'INSERT INTO users (username, email, password, uuid) VALUES (?, ?, ?, ?)', (username, email, hashed_password, uuid[1]))
         logger.info(f"邮箱 {email} 执行注册成功")
         vid = Ver.apply_verification_id(email)
-        msg = Message('【FuCubeMC】注册激活',
-                      sender='barinfo@yeah.net',
-                      recipients=[email],
-                      bcc=['barinfo@yeah.net'])
-        msg.html = f'''
+        msg = mail.send('【FuCubeMC】注册激活',
+                      'barinfo@yeah.net',
+                      [email],
+                      "请使用客户端查看内容",f'''
 <table class="main" width="100%" cellpadding="0" cellspacing="0" style="font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; border-radius: 3px; background-color: #fff; margin: 0; border: 1px 
 solid #e9e9e9;
 " bgcolor=" #fff">
@@ -226,8 +225,7 @@ Neue',Helvetica,Arial,sans-serif; box-sizing: border-box; font-size: 14px; verti
         </tr>
     </tbody>
 </table>
-        '''
-        mail.send(msg)
+        ''')
         return jsonify({'message': '注册成功，请前往邮箱验证'}), 200
     else:
         return jsonify({'error': uuid[1]}), 500
