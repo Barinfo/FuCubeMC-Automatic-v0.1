@@ -343,3 +343,97 @@ class Mcsm:
         print(response.text)
         if response.json()["status"] == 200:
             return response.json()["data"]["instanceUuid"]
+    
+    def giveExample(self,Example,user):
+        """
+        给与用户实例
+        创建实例并返回是否成功的布尔值。
+
+        参数:
+        url: API的基础URL
+        apikey: API密钥
+        Example: 实例uuid
+        user: 用户UUID
+
+        返回:
+        str: 实例的UUID
+        """
+        api_url = f"{self.url}/api/auth?apikey={self.apikey}"
+        data = {
+    "config": {
+        "instances": [
+            {
+                "instanceUuid": "210e6c56ff7a47159258a3d8d35ce6db",
+                "daemonId": "bf812a47a8e24e738cd36c617727a2b6",
+                "nickname": "0001",
+                "status": 3,
+                "hostIp": "localhost:24444",
+                "config": {
+                    "nickname": "0001",
+                    "startCommand": "bedrock_server_mod.exe",
+                    "stopCommand": "stop",
+                    "cwd": "D://server/0001",
+                    "ie": "utf8",
+                    "oe": "utf8",
+                    "createDatetime": 1722600268334,
+                    "lastDatetime": 1722663864344,
+                    "type": "minecraft/bedrock",
+                    "tag": [],
+                    "endTime": None,
+                    "fileCode": "utf8",
+                    "processType": "general",
+                    "updateCommand": "",
+                    "crlf": 2,
+                    "enableRcon": False,
+                    "rconPassword": "",
+                    "rconPort": 0,
+                    "rconIp": "",
+                    "actionCommandList": [],
+                    "terminalOption": {
+                        "haveColor": False,
+                        "pty": True,
+                        "ptyWindowCol": 164,
+                        "ptyWindowRow": 40
+                    },
+                    "eventTask": {
+                        "autoStart": False,
+                        "autoRestart": False,
+                        "ignore": False
+                    },
+                    "docker": {
+                        "containerName": "",
+                        "image": "",
+                        "ports": [],
+                        "extraVolumes": [],
+                        "memory": 0,
+                        "networkMode": "bridge",
+                        "networkAliases": [],
+                        "cpusetCpus": "",
+                        "cpuUsage": 0,
+                        "maxSpace": 0,
+                        "io": 0,
+                        "network": 0,
+                        "workingDir": "/workspace/",
+                        "env": []
+                    },
+                    "pingConfig": {
+                        "ip": "",
+                        "port": 25565,
+                        "type": 1
+                    },
+                    "extraServiceConfig": {
+                        "openFrpTunnelId": "",
+                        "openFrpToken": ""
+                    }
+                }
+            }
+        ]
+    },
+    "uuid": "36f83ef4a03e4c62a232778fb54a0878"
+}
+        headers = {
+            'x-requested-with': 'xmlhttprequest'
+        }
+
+        response = requests.put(api_url, data=data, headers=headers)
+        return response.text
