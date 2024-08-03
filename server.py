@@ -1,5 +1,5 @@
 from flask import Flask, make_response, send_from_directory, abort, request, jsonify, redirect, render_template
-from mail import Mail
+from mail import MailSender
 from datetime import datetime
 from until import Logger, AccountVerification, DBConnection, Mcsm
 from panel import app as panel_app
@@ -22,7 +22,7 @@ app.config['MAIL_PASSWORD'] = 'TQCSAJGFEWKOPJGM'
 app.config['SECRET_KEY'] = 'MFOq1joZmEur0GR8'
 app.config['SESSION_TYPE'] = 'filesystem'
 
-mail = Mail(app)
+mail = MailSender(app)
 
 app.register_blueprint(panel_app, url_prefix='/panel')
 
