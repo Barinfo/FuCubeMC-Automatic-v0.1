@@ -4,6 +4,8 @@
 
 此项目基于 Python 开发，以 sqlite 作为数据库的MCSM一键对接网站
 
+~~此项目因开发组开学停更，但不代表弃坑~~
+
 ![maven](https://img.shields.io/badge/python-3.8%2B-blue)
 
 An automatic controller for MCSManager
